@@ -43,10 +43,6 @@ Em uma execução HTTPS, deixe `ALLOW_LOCAL_HTTP=false` e use uma URI de callbac
 3. O caminho de sucesso espera uma identidade verificada. O cadastro local será prévio e o callback recusa identidades desconhecidas com `403`. A chave única do vínculo combina `oidc_issuer` e `oidc_sub`, conforme a regra de identidade `iss` + `sub` do item 1.2. O campo `user_name` é único e serve para exibição.
 4. A sessão guarda o ID interno do usuário no servidor e recebe um identificador novo após o login. Ela expira após 30 minutos de inatividade ou oito horas no total. `POST /logout` valida um token CSRF e invalida a sessão no banco. `GET /admin` consulta o papel local a cada acesso e devolve `403` para um usuário autenticado com `role=user`. O papel local é a base para a integração com Google. Para a opção 1, resta definir como o `role` do ID Token validado será aplicado ao cadastro local.
 
-## Verificações realizadas no esqueleto
-
-Validação local com Python 3.13 e o cliente de teste do Flask. O resultado de PKCE correspondeu ao vetor do apêndice B da RFC 7636. O callback rejeitou `state` divergente antes de chamar a integração e rejeitou a repetição de uma tentativa consumida. Uma identidade fictícia fornecida pelo teste permitiu verificar a rotação, a expiração e a invalidação da sessão, a proteção CSRF do logout e a mudança da resposta de `/admin` de `403` para `200` após atualizar o perfil no banco. A integração real com um provedor e a validação criptográfica seguem pendentes.
-
 ## Continuação da avaliação
 
 - Completar `authenticate()` com descoberta do emissor configurado, troca do código com timeout e sem repetição automática, e validação do ID Token com JWKS e lista fixa `RS256`. `httpx` pode atender as chamadas HTTP e `PyJWT[crypto]` pode verificar o JWT. O retorno deve conter apenas uma identidade cuja assinatura e claims foram verificados.

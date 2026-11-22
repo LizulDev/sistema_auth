@@ -3,12 +3,24 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Área administrativa</title>
+    <title>Área Administrativa</title>
+    <style>
+        body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; background: #f8fafc; color: #0f172a; margin: 0; padding: 2rem; }
+        main { max-width: 720px; margin: 0 auto; background: #ffffff; border: 1px solid #bbf7d0; border-radius: 12px; padding: 2rem; }
+        h1 { margin-top: 0; color: #166534; }
+        .badge { display: inline-block; background: #dcfce7; color: #166534; padding: 0.2rem 0.65rem; border-radius: 999px; font-size: 0.8rem; font-weight: 600; }
+        code { background: #f1f5f9; padding: 0.1rem 0.35rem; border-radius: 4px; }
+        .btn { display: inline-block; text-decoration: none; padding: 0.6rem 1rem; border-radius: 6px; font-weight: 600; background: #2563eb; color: #fff; }
+    </style>
 </head>
 <body>
     <main>
-        <h1>Área administrativa</h1>
-        <p><a href="{{ url_for('web.index') }}">Voltar ao início</a></p>
+        <span class="badge">Acesso Autorizado — role=admin</span>
+        <h1>Área Administrativa</h1>
+        {% if user %}
+            <p>Acesso concedido no servidor para <strong>{{ user['full_name'] }}</strong> (<code>{{ user['user_name'] }}</code>, perfil <code>{{ user['role'] }}</code>).</p>
+        {% endif %}
+        <p><a class="btn" href="{{ url_for('web.index') }}">Voltar ao início</a></p>
     </main>
 </body>
 </html>

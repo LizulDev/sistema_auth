@@ -3,22 +3,107 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Autenticação e autorização</title>
+    <title>Autenticação e Autorização — OAuth 2.0 + OIDC</title>
+    <style>
+        body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; background: #f8fafc; color: #0f172a; margin: 0; padding: 2rem; }
+        main { max-width: 920px; margin: 0 auto; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 2rem; box-shadow: 0 2px 10px rgba(15, 23, 42, 0.05); }
+        h1 { margin-top: 0; color: #0f172a; font-size: 1.6rem; }
+        h2 { color: #1e293b; font-size: 1.2rem; margin-top: 1.75rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.4rem; }
+        .badge { display: inline-block; padding: 0.2rem 0.65rem; border-radius: 999px; font-size: 0.8rem; font-weight: 600; }
+        .badge-admin { background: #dcfce7; color: #166534; }
+        .badge-user { background: #e0f2fe; color: #075985; }
+        .badge-info { background: #ede9fe; color: #5b21b6; margin-bottom: 0.6rem; }
+        .card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 1rem 1.25rem; margin: 1rem 0; }
+        .actions { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; margin: 1rem 0; }
+        .btn { display: inline-block; text-decoration: none; padding: 0.65rem 1.2rem; border-radius: 6px; font-weight: 600; border: none; cursor: pointer; font-size: 0.95rem; }
+        .btn-primary { background: #2563eb; color: #fff; }
+        .btn-admin { background: #0f766e; color: #fff; }
+        .btn-danger { background: #dc2626; color: #fff; }
+        pre { background: #0f172a; color: #e2e8f0; padding: 1rem; border-radius: 8px; overflow-x: auto; font-size: 0.85rem; line-height: 1.45; }
+        code { background: #f1f5f9; padding: 0.1rem 0.35rem; border-radius: 4px; color: #0f172a; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin-top: 0.75rem; }
+        th, td { text-align: left; padding: 0.55rem 0.7rem; border-bottom: 1px solid #e2e8f0; }
+        th { background: #f1f5f9; }
+        .ok { color: #15803d; font-weight: 700; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; }
+    </style>
 </head>
 <body>
     <main>
-        <h1>Autenticação e autorização</h1>
+        <span class="badge badge-info">Aplicação Cliente (Relying Party) — OAuth 2.0 + OIDC</span>
+        <h1>Autenticação e Autorização</h1>
+
         {% if user %}
-            <p>Olá, {{ user['full_name'] }}.</p>
-            {% if user['role'] == 'admin' %}
-                <p><a href="{{ url_for('web.admin') }}">Área administrativa</a></p>
+            <div class="card">
+                <p>Olá, <strong>{{ user['full_name'] }}</strong> (<code>{{ user['user_name'] }}</code>).</p>
+                <p>
+                    <strong>ID interno:</strong> <code>{{ user['id'] }}</code> |
+                    <strong>OIDC sub:</strong> <code>{{ user['oidc_sub'] }}</code> |
+                    <strong>Perfil (role):</strong>
+                    <span class="badge {{ 'badge-admin' if user['role'] == 'admin' else 'badge-user' }}">{{ user['role'] }}</span>
+                </p>
+                <div class="actions">
+                    <a class="btn btn-admin" href="{{ url_for('web.admin') }}">Área administrativa (/admin)</a>
+                    <form method="post" action="{{ url_for('web.logout') }}" style="margin:0;">
+                        <input type="hidden" name="csrf_token" value="{{ user['csrf_token'] }}">
+                        <button class="btn btn-danger" type="submit">Sair</button>
+                    </form>
+                </div>
+                <p><small>O controle de acesso de <code>/admin</code> é aplicado no servidor a cada requisição (retorna HTTP 200 para <code>admin</code> e HTTP 403 para <code>user</code>).</small></p>
+            </div>
+
+            {% if inspection %}
+                <h2>ID Token Decomposto (renderizado no servidor — sem exposição em JS/localStorage)</h2>
+                <div class="grid">
+                    <div>
+                        <h3>1. Cabeçalho (Header)</h3>
+                        <pre>{{ header_pretty }}</pre>
+                    </div>
+                    <div>
+                        <h3>2. Payload (Claims validados)</h3>
+                        <pre>{{ payload_pretty }}</pre>
+                    </div>
+                </div>
+                <h3>3. Assinatura (RS256 — {{ inspection['signature_bytes'] }} bytes)</h3>
+                <pre>Base64URL: {{ inspection['signature_b64'] }}
+Hex (prefixo): {{ inspection['signature_hex_preview'] }}</pre>
+
+                {% if userinfo_pretty %}
+                    <h3>Resposta de /userinfo (Bearer access_token)</h3>
+                    <pre>{{ userinfo_pretty }}</pre>
+                {% endif %}
+
+                <h2>Checklist de Validação OIDC (Item 4.3 — {{ inspection['checks']|length }}/10)</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Verificação</th>
+                            <th>Status</th>
+                            <th>Evidência</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for check in inspection['checks'] %}
+                            <tr>
+                                <td>{{ check['item'] }}</td>
+                                <td>{{ check['check'] }}</td>
+                                <td class="ok">{{ check['status'] }}</td>
+                                <td><code>{{ check['detail'] }}</code></td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             {% endif %}
-            <form method="post" action="{{ url_for('web.logout') }}">
-                <input type="hidden" name="csrf_token" value="{{ user['csrf_token'] }}">
-                <button type="submit">Sair</button>
-            </form>
         {% elif configured %}
-            <p><a href="{{ url_for('web.login') }}">Entrar</a></p>
+            <div class="card">
+                <p>Fluxo configurado: <strong>Authorization Code + PKCE (S256) + OpenID Connect</strong>.</p>
+                <p><strong>Provedor (Issuer):</strong> <code>{{ issuer }}</code></p>
+                <div class="actions">
+                    <a class="btn btn-primary" href="{{ url_for('web.login') }}">Entrar com OpenID Connect</a>
+                </div>
+                <p><small>As credenciais são inseridas apenas no Servidor de Autorização. A aplicação cliente valida o ID Token em RS256 usando o JWKS público antes de criar a sessão local.</small></p>
+            </div>
         {% else %}
             <p>Configure o provedor OpenID Connect para iniciar o fluxo de login.</p>
         {% endif %}

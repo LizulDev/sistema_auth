@@ -1,0 +1,197 @@
+{
+  "info": {
+    "name": "Cyber Security 33506 — OAuth 2.0 + OIDC (Opcao 1)",
+    "description": "Colecao de requisicoes dos endpoints do Servidor de Autorizacao (porta 8001) e da Aplicacao Cliente (porta 8000), incluindo cenarios positivos e negativos.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "op_base_url", "value": "http://localhost:8001" },
+    { "key": "client_base_url", "value": "http://localhost:8000" },
+    { "key": "client_id", "value": "app-cybersecurity-33506" },
+    { "key": "client_secret", "value": "SEU_CLIENT_SECRET_LOCAL" },
+    { "key": "redirect_uri", "value": "http://localhost:8000/callback" },
+    { "key": "authorization_code", "value": "COLE_O_CODE_RECEBIDO" },
+    { "key": "code_verifier", "value": "COLE_O_CODE_VERIFIER_ORIGINAL" },
+    { "key": "code_challenge", "value": "BASE64URL_SHA256_CODE_VERIFIER" },
+    { "key": "access_token", "value": "COLE_O_ACCESS_TOKEN" }
+  ],
+  "item": [
+    {
+      "name": "1. OpenID Provider (Servidor de Autorizacao)",
+      "item": [
+        {
+          "name": "GET /.well-known/openid-configuration (Discovery)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{op_base_url}}/.well-known/openid-configuration"
+          }
+        },
+        {
+          "name": "GET /jwks.json (Chaves Publicas RSA)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{op_base_url}}/jwks.json"
+          }
+        },
+        {
+          "name": "GET /authorize (Authorization Code + PKCE S256)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{op_base_url}}/authorize?response_type=code&client_id={{client_id}}&redirect_uri={{redirect_uri}}&scope=openid%20profile%20email&state=demo-state-123456&nonce=demo-nonce-123456&code_challenge={{code_challenge}}&code_challenge_method=S256",
+              "host": ["{{op_base_url}}"],
+              "path": ["authorize"],
+              "query": [
+                { "key": "response_type", "value": "code" },
+                { "key": "client_id", "value": "{{client_id}}" },
+                { "key": "redirect_uri", "value": "{{redirect_uri}}" },
+                { "key": "scope", "value": "openid profile email" },
+                { "key": "state", "value": "demo-state-123456" },
+                { "key": "nonce", "value": "demo-nonce-123456" },
+                { "key": "code_challenge", "value": "{{code_challenge}}" },
+                { "key": "code_challenge_method", "value": "S256" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "POST /token (client_secret_post)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/x-www-form-urlencoded" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "grant_type", "value": "authorization_code" },
+                { "key": "code", "value": "{{authorization_code}}" },
+                { "key": "redirect_uri", "value": "{{redirect_uri}}" },
+                { "key": "code_verifier", "value": "{{code_verifier}}" },
+                { "key": "client_id", "value": "{{client_id}}" },
+                { "key": "client_secret", "value": "{{client_secret}}" }
+              ]
+            },
+            "url": "{{op_base_url}}/token"
+          }
+        },
+        {
+          "name": "POST /token (client_secret_basic)",
+          "request": {
+            "method": "POST",
+            "auth": {
+              "type": "basic",
+              "basic": [
+                { "key": "username", "value": "{{client_id}}" },
+                { "key": "password", "value": "{{client_secret}}" }
+              ]
+            },
+            "header": [
+              { "key": "Content-Type", "value": "application/x-www-form-urlencoded" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "grant_type", "value": "authorization_code" },
+                { "key": "code", "value": "{{authorization_code}}" },
+                { "key": "redirect_uri", "value": "{{redirect_uri}}" },
+                { "key": "code_verifier", "value": "{{code_verifier}}" }
+              ]
+            },
+            "url": "{{op_base_url}}/token"
+          }
+        },
+        {
+          "name": "GET /userinfo (Bearer Access Token)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": "{{op_base_url}}/userinfo"
+          }
+        },
+        {
+          "name": "POST /logout (Encerrar sessao no Provedor)",
+          "request": {
+            "method": "POST",
+            "url": "{{op_base_url}}/logout"
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Aplicacao Cliente (Relying Party)",
+      "item": [
+        {
+          "name": "GET / (Pagina Inicial)",
+          "request": {
+            "method": "GET",
+            "url": "{{client_base_url}}/"
+          }
+        },
+        {
+          "name": "GET /login (Iniciar fluxo Authorization Code + PKCE)",
+          "request": {
+            "method": "GET",
+            "url": "{{client_base_url}}/login"
+          }
+        },
+        {
+          "name": "GET /admin (Rota protegida por role=admin)",
+          "request": {
+            "method": "GET",
+            "url": "{{client_base_url}}/admin"
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Exemplos de Testes Negativos",
+      "item": [
+        {
+          "name": "NEG #11 — /authorize com redirect_uri com barra final extra (400 sem redirecionar)",
+          "request": {
+            "method": "GET",
+            "url": "{{op_base_url}}/authorize?response_type=code&client_id={{client_id}}&redirect_uri={{redirect_uri}}/&scope=openid%20profile%20email&state=s1&nonce=n1&code_challenge={{code_challenge}}&code_challenge_method=S256"
+          }
+        },
+        {
+          "name": "NEG #14 — /userinfo sem Bearer token (401 + WWW-Authenticate)",
+          "request": {
+            "method": "GET",
+            "url": "{{op_base_url}}/userinfo"
+          }
+        },
+        {
+          "name": "NEG #08 — /callback com state divergente (400)",
+          "request": {
+            "method": "GET",
+            "url": "{{client_base_url}}/callback?code=fake&state=divergente"
+          }
+        },
+        {
+          "name": "NEG — /token com grant_type password proibido (400 unsupported_grant_type)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/x-www-form-urlencoded" }],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "grant_type", "value": "password" },
+                { "key": "client_id", "value": "{{client_id}}" },
+                { "key": "client_secret", "value": "{{client_secret}}" }
+              ]
+            },
+            "url": "{{op_base_url}}/token"
+          }
+        }
+      ]
+    }
+  ]
+}

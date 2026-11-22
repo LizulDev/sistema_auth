@@ -22,21 +22,31 @@ class OidcSettings:
     client_id: str
     client_secret: str = field(repr=False)
     redirect_uri: str
+    allow_local_http: bool = False
+    http_timeout: float = 5.0
+    clock_skew_seconds: int = 60
 
     @classmethod
     def from_env(cls, *, allow_local_http: bool) -> "OidcSettings":
+        issuer = os.getenv("OIDC_ISSUER", "").rstrip("/")
         settings = cls(
-            issuer=os.getenv("OIDC_ISSUER", ""),
+            issuer=issuer,
             authorization_endpoint=os.getenv("OIDC_AUTHORIZATION_ENDPOINT", ""),
             client_id=os.getenv("OIDC_CLIENT_ID", ""),
             client_secret=os.getenv("OIDC_CLIENT_SECRET", ""),
             redirect_uri=os.getenv("OIDC_REDIRECT_URI", "http://localhost:8000/callback"),
+            allow_local_http=allow_local_http,
+            http_timeout=float(os.getenv("OIDC_HTTP_TIMEOUT", "5")),
+            clock_skew_seconds=int(os.getenv("OIDC_CLOCK_SKEW_SECONDS", "60")),
         )
         if settings.configured:
-            for url in (settings.issuer, settings.authorization_endpoint, settings.redirect_uri):
+            urls = [settings.issuer, settings.redirect_uri]
+            if settings.authorization_endpoint:
+                urls.append(settings.authorization_endpoint)
+            for url in urls:
                 validate_url(url, allow_local_http=allow_local_http)
         return settings
 
     @property
     def configured(self) -> bool:
-        return all((self.issuer, self.authorization_endpoint, self.client_id, self.redirect_uri))
+        return all((self.issuer, self.client_id, self.redirect_uri))

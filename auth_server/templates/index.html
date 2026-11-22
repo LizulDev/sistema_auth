@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>OpenID Provider — Servidor de Autorização</title>
+    <style>
+        body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; background: #0f172a; color: #e2e8f0; margin: 0; padding: 2rem; }
+        main { max-width: 720px; margin: 0 auto; background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 2rem; }
+        h1 { margin-top: 0; color: #38bdf8; font-size: 1.5rem; }
+        .badge { display: inline-block; background: #0369a1; color: #f0f9ff; padding: 0.2rem 0.6rem; border-radius: 999px; font-size: 0.8rem; }
+        code { background: #0f172a; padding: 0.15rem 0.4rem; border-radius: 4px; color: #a5f3fc; }
+        ul { line-height: 1.8; }
+        a { color: #38bdf8; }
+        button { background: #dc2626; color: #fff; border: none; padding: 0.55rem 1.1rem; border-radius: 6px; cursor: pointer; font-weight: 600; }
+        .card { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 1rem; margin: 1rem 0; }
+    </style>
+</head>
+<body>
+    <main>
+        <span class="badge">OpenID Connect Provider — Opção 1</span>
+        <h1>Servidor de Autorização OAuth 2.0 + OIDC</h1>
+        <div class="card">
+            <p><strong>Issuer:</strong> <code>{{ issuer }}</code></p>
+            <p><strong>Chave ativa (kid):</strong> <code>{{ active_kid }}</code> (RS256)</p>
+        </div>
+
+        <h2>Endpoints públicos</h2>
+        <ul>
+            <li><a href="{{ url_for('op.openid_configuration') }}"><code>/.well-known/openid-configuration</code></a> (Descoberta OIDC)</li>
+            <li><a href="{{ url_for('op.jwks') }}"><code>/jwks.json</code></a> (Chaves públicas RSA em JWK)</li>
+            <li><code>/authorize</code> — Authorization Code + PKCE S256</li>
+            <li><code>/token</code> — Troca do código por <code>id_token</code>, <code>access_token</code> e <code>refresh_token</code></li>
+            <li><code>/userinfo</code> — Recurso protegido por Bearer Access Token</li>
+        </ul>
+
+        <div class="card">
+            {% if user %}
+                <p>Sessão ativa no provedor: <strong>{{ user['full_name'] }}</strong> (<code>{{ user['username'] }}</code>, sub: <code>{{ user['sub'] }}</code>, role: <code>{{ user['role'] }}</code>)</p>
+                <form method="post" action="{{ url_for('op.logout') }}">
+                    <input type="hidden" name="csrf_token" value="{{ user['csrf_token'] }}">
+                    <button type="submit">Encerrar sessão no Provedor</button>
+                </form>
+            {% else %}
+                <p>Nenhuma sessão ativa no Servidor de Autorização.</p>
+            {% endif %}
+        </div>
+    </main>
+</body>
+</html>

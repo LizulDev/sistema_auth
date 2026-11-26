@@ -1,0 +1,1009 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <title>Relatório Técnico — Avaliação A1/3 Cyber Security (OAuth 2.0 + OIDC)</title>
+  <style>
+    @page {
+      size: A4 portrait;
+      margin: 0;
+    }
+    * {
+      box-sizing: border-box;
+    }
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
+      color: #0f172a;
+      background: #ffffff;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .page {
+      width: 210mm;
+      height: 297mm;
+      padding: 12mm 13mm 11mm 13mm;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      page-break-after: always;
+      overflow: hidden;
+    }
+    .page:last-child {
+      page-break-after: auto;
+    }
+    .page-body {
+      flex: 1;
+      overflow: hidden;
+    }
+    .page-footer {
+      border-top: 1px solid #cbd5e1;
+      padding-top: 4px;
+      margin-top: 6px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 7.4pt;
+      color: #475569;
+    }
+
+    /* Header banner */
+    .doc-header {
+      border-bottom: 2.5px solid #0f3d75;
+      padding-bottom: 7px;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 10px;
+    }
+    .doc-header .inst {
+      font-size: 7.5pt;
+      font-weight: 700;
+      letter-spacing: 0.4px;
+      color: #0f3d75;
+      text-transform: uppercase;
+    }
+    .doc-header h1 {
+      margin: 2px 0 2px;
+      font-size: 13.5pt;
+      color: #0f172a;
+      line-height: 1.15;
+    }
+    .doc-header .subtitle {
+      font-size: 8.4pt;
+      color: #334155;
+      margin: 0;
+    }
+    .meta-box {
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      border-left: 3.5px solid #0f3d75;
+      border-radius: 4px;
+      padding: 5px 8px;
+      font-size: 7.7pt;
+      line-height: 1.4;
+      min-width: 68mm;
+    }
+    .meta-box strong {
+      color: #0f172a;
+    }
+
+    /* Section headings */
+    h2 {
+      font-size: 10.2pt;
+      color: #0f3d75;
+      border-bottom: 1.5px solid #dbeafe;
+      padding-bottom: 2px;
+      margin: 7px 0 5px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    h2 .sec-num {
+      display: inline-block;
+      background: #0f3d75;
+      color: #ffffff;
+      font-size: 7.5pt;
+      font-weight: 700;
+      padding: 1px 5px;
+      border-radius: 3px;
+    }
+    h3 {
+      font-size: 8.6pt;
+      color: #1e293b;
+      margin: 6px 0 3px;
+    }
+    p {
+      font-size: 8.2pt;
+      line-height: 1.38;
+      margin: 0 0 5px;
+      color: #1e293b;
+    }
+    ul {
+      margin: 2px 0 5px;
+      padding-left: 15px;
+      font-size: 8pt;
+      line-height: 1.35;
+    }
+    li {
+      margin-bottom: 2px;
+    }
+
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 4px 0 6px;
+      font-size: 7.35pt;
+      line-height: 1.28;
+    }
+    th {
+      background: #0f3d75;
+      color: #ffffff;
+      text-align: left;
+      padding: 3.5px 5px;
+      font-weight: 600;
+      border: 1px solid #0f3d75;
+    }
+    th code {
+      background: rgba(255, 255, 255, 0.18);
+      color: #ffffff;
+    }
+    td {
+      padding: 3.2px 5px;
+      border: 1px solid #cbd5e1;
+      vertical-align: top;
+    }
+    tbody tr:nth-child(even) {
+      background: #f8fafc;
+    }
+    .center { text-align: center; }
+    .nowrap { white-space: nowrap; }
+
+    /* Code and pre blocks */
+    code {
+      font-family: "Cascadia Code", Consolas, "Courier New", monospace;
+      font-size: 7.1pt;
+      background: #f1f5f9;
+      padding: 0.5px 3px;
+      border-radius: 2.5px;
+      color: #0f172a;
+      word-break: break-word;
+    }
+    pre {
+      font-family: "Cascadia Code", Consolas, "Courier New", monospace;
+      font-size: 6.9pt;
+      line-height: 1.28;
+      background: #0f172a;
+      color: #e2e8f0;
+      padding: 6px 8px;
+      border-radius: 5px;
+      margin: 3px 0 5px;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+    .code-light {
+      background: #f8fafc;
+      color: #0f172a;
+      border: 1px solid #cbd5e1;
+    }
+
+    /* Badges and callouts */
+    .badge-ok {
+      display: inline-block;
+      background: #dcfce7;
+      color: #166534;
+      border: 1px solid #86efac;
+      font-weight: 700;
+      font-size: 6.7pt;
+      padding: 0.5px 4px;
+      border-radius: 3px;
+    }
+    .badge-sec {
+      display: inline-block;
+      background: #dbeafe;
+      color: #1e40af;
+      border: 1px solid #93c5fd;
+      font-weight: 700;
+      font-size: 6.7pt;
+      padding: 0.5px 4px;
+      border-radius: 3px;
+    }
+    .callout {
+      background: #f0f9ff;
+      border: 1px solid #bae6fd;
+      border-left: 3.5px solid #0284c7;
+      border-radius: 4px;
+      padding: 5px 8px;
+      margin: 4px 0 6px;
+      font-size: 7.8pt;
+      line-height: 1.34;
+    }
+    .callout-warn {
+      background: #fefce8;
+      border: 1px solid #fde047;
+      border-left: 3.5px solid #ca8a04;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 7px;
+    }
+    .grid-2-asym {
+      display: grid;
+      grid-template-columns: 0.85fr 1.15fr;
+      gap: 7px;
+    }
+    .card {
+      border: 1px solid #cbd5e1;
+      border-radius: 5px;
+      padding: 5px 7px;
+      background: #f8fafc;
+    }
+    .card-title {
+      font-size: 7.9pt;
+      font-weight: 700;
+      color: #0f3d75;
+      margin: 0 0 3px;
+    }
+    .diagram-wrap {
+      border: 1px solid #cbd5e1;
+      border-radius: 5px;
+      padding: 5px 4px 3px;
+      background: #ffffff;
+      margin: 4px 0;
+    }
+    .small-note {
+      font-size: 7.2pt;
+      color: #475569;
+    }
+    .neg-table td {
+      padding: 3.5px 4.5px;
+      font-size: 7.15pt;
+      line-height: 1.25;
+    }
+    .neg-table th {
+      font-size: 7.2pt;
+      padding: 3.5px 4.5px;
+    }
+    .chk-table td {
+      padding: 2.7px 4.5px;
+      font-size: 7.15pt;
+      line-height: 1.24;
+    }
+    .compact-table td, .compact-table th {
+      padding: 2.3px 4.5px;
+      font-size: 7.1pt;
+      line-height: 1.22;
+    }
+    .compact-cards ul {
+      font-size: 7.45pt;
+      line-height: 1.26;
+      margin: 1px 0 2px;
+    }
+    .compact-cards li {
+      margin-bottom: 1.5px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ====================================================================== -->
+<!-- PÁGINA 1: IDENTIFICAÇÃO, ARQUITETURA E DIAGRAMA DE FLUXO               -->
+<!-- ====================================================================== -->
+<section class="page">
+  <div class="page-body">
+    <header class="doc-header">
+      <div>
+        <div class="inst">Universidade do Oeste de Santa Catarina (UNOESC) — Engenharia de Computação</div>
+        <h1>Autenticação e Autorização — OAuth 2.0 + OpenID Connect</h1>
+        <p class="subtitle">Avaliação A1/3 — Disciplina 33506 (Cyber Security) • Opção 1: OpenID Provider Próprio + Aplicação Cliente</p>
+      </div>
+      <div class="meta-box">
+        <div><strong>Professor:</strong> Odemir Moreira da Mata Junior</div>
+        <div><strong>Acadêmicos:</strong> Pedro Diniz; Luiz Felipe Kauê da Silva</div>
+        <div><strong>Data:</strong> 26/11/2026 &nbsp;|&nbsp; <strong>Stack:</strong> Python 3.12, Flask, SQLite</div>
+      </div>
+    </header>
+
+    <h2><span class="sec-num">1</span> Arquitetura e Componentes Implementados</h2>
+    <p>
+      O sistema implementa a <strong>Opção 1</strong> em dois processos independentes escritos exclusivamente em Python (Flask + SQLite), com renderização 100% no servidor — sem JavaScript no back-end e sem exposição de tokens em <code>localStorage</code> ou scripts do navegador. A senha do usuário trafega apenas entre o navegador e o Servidor de Autorização (OpenID Provider).
+    </p>
+
+    <div class="grid-2 compact-cards">
+      <div class="card">
+        <div class="card-title">Servidor de Autorização — <code>auth_server/</code> (OP)</div>
+        <p class="small-note" style="margin-bottom:2px;">Portas: <code>:8443</code> (HTTPS) / <code>:8001</code> (HTTP local dev)</p>
+        <ul>
+          <li><code>GET /.well-known/openid-configuration</code> e <code>GET /jwks.json</code> (RSA com <code>kid</code> e rotação).</li>
+          <li><code>GET/POST /authorize</code> — <code>redirect_uri</code> exata, login Argon2id, rate limit, consentimento e <code>code</code> (TTL ≤ 60s).</li>
+          <li><code>POST /token</code> — <code>client_secret_post/basic</code>, PKCE S256, uso único + revogação em replay, RS256 e <code>no-store</code>.</li>
+          <li><code>GET/POST /userinfo</code> (Bearer) e <code>POST /logout</code> (sessão OP).</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-title">Aplicação Cliente — <code>app/</code> (Relying Party)</div>
+        <p class="small-note" style="margin-bottom:2px;">Portas: <code>:8444</code> (HTTPS) / <code>:8000</code> (HTTP local dev)</p>
+        <ul>
+          <li><code>GET /</code> — Status da sessão, decomposição do ID Token e checklist 10/10.</li>
+          <li><code>GET /login</code> — Gera <code>state</code>, <code>nonce</code> e <code>code_verifier</code> (256 bits) + <code>code_challenge</code> S256.</li>
+          <li><code>GET /callback</code> — Valida <code>state</code> antes de <code>/token</code> (sem retry), valida ID Token (<code>RS256</code>), chama <code>/userinfo</code> e vincula <code>(iss, sub)</code>.</li>
+          <li><code>GET /admin</code> (<code>role=admin</code> → 200; <code>user</code> → 403) e <code>POST /logout</code> (CSRF).</li>
+        </ul>
+      </div>
+    </div>
+
+    <h2><span class="sec-num">2</span> Diagrama do Fluxo Implementado (Authorization Code + PKCE S256 + OIDC)</h2>
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 740 398" width="100%" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Arial, sans-serif">
+        <defs>
+          <marker id="arr-b" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 1 L 10 5 L 0 9 z" fill="#0f3d75"/>
+          </marker>
+          <marker id="arr-g" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 1 L 10 5 L 0 9 z" fill="#0f766e"/>
+          </marker>
+          <marker id="arr-p" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 1 L 10 5 L 0 9 z" fill="#6d28d9"/>
+          </marker>
+        </defs>
+
+        <!-- Actor boxes -->
+        <rect x="8" y="4" width="136" height="32" rx="5" fill="#0f3d75"/>
+        <text x="76" y="18" text-anchor="middle" fill="#fff" font-size="9.2" font-weight="700">Usuário / Navegador</text>
+        <text x="76" y="29" text-anchor="middle" fill="#cbd5e1" font-size="7.2">Resource Owner (sem JWT)</text>
+
+        <rect x="196" y="4" width="154" height="32" rx="5" fill="#1d4ed8"/>
+        <text x="273" y="18" text-anchor="middle" fill="#fff" font-size="9.2" font-weight="700">Aplicação Cliente (RP)</text>
+        <text x="273" y="29" text-anchor="middle" fill="#dbeafe" font-size="7.2">app/ (:8444 HTTPS | :8000 HTTP)</text>
+
+        <rect x="404" y="4" width="158" height="32" rx="5" fill="#0f766e"/>
+        <text x="483" y="18" text-anchor="middle" fill="#fff" font-size="9.2" font-weight="700">Servidor de Autorização</text>
+        <text x="483" y="29" text-anchor="middle" fill="#ccfbf1" font-size="7.2">auth_server/ (:8443 | :8001)</text>
+
+        <rect x="606" y="4" width="126" height="32" rx="5" fill="#5b21b6"/>
+        <text x="669" y="18" text-anchor="middle" fill="#fff" font-size="9.2" font-weight="700">Recursos / JWKS</text>
+        <text x="669" y="29" text-anchor="middle" fill="#ede9fe" font-size="7.2">/jwks.json e /userinfo</text>
+
+        <!-- Lifelines -->
+        <line x1="76" y1="36" x2="76" y2="394" stroke="#94a3b8" stroke-width="1.1" stroke-dasharray="4 3"/>
+        <line x1="273" y1="36" x2="273" y2="394" stroke="#94a3b8" stroke-width="1.1" stroke-dasharray="4 3"/>
+        <line x1="483" y1="36" x2="483" y2="394" stroke="#94a3b8" stroke-width="1.1" stroke-dasharray="4 3"/>
+        <line x1="669" y1="36" x2="669" y2="394" stroke="#94a3b8" stroke-width="1.1" stroke-dasharray="4 3"/>
+
+        <!-- Step 1 -->
+        <line x1="76" y1="53" x2="269" y2="53" stroke="#0f3d75" stroke-width="1.35" marker-end="url(#arr-b)"/>
+        <text x="174" y="48" text-anchor="middle" font-size="7.7" font-weight="600" fill="#0f172a">1. GET /login ("Entrar com OpenID Connect")</text>
+
+        <!-- Step 2 -->
+        <rect x="166" y="59" width="214" height="23" rx="3" fill="#eff6ff" stroke="#93c5fd"/>
+        <text x="273" y="69" text-anchor="middle" font-size="7.1" fill="#1e3a8a">2. Gera state, nonce, code_verifier (256 bits) + cookie oidc_flow</text>
+        <text x="273" y="78" text-anchor="middle" font-size="7.1" fill="#1e3a8a">code_challenge = BASE64URL(SHA256(code_verifier))</text>
+
+        <!-- Step 3 -->
+        <line x1="273" y1="96" x2="80" y2="96" stroke="#0f3d75" stroke-width="1.35" stroke-dasharray="4 2" marker-end="url(#arr-b)"/>
+        <text x="175" y="91" text-anchor="middle" font-size="7.2" fill="#0f172a">3. 302 → /authorize (response_type=code, S256)</text>
+
+        <!-- Step 4 -->
+        <line x1="76" y1="115" x2="479" y2="115" stroke="#0f766e" stroke-width="1.35" marker-end="url(#arr-g)"/>
+        <text x="280" y="110" text-anchor="middle" font-size="7.5" font-weight="600" fill="#0f766e">4. GET /authorize (client_id, redirect_uri exata, scope openid profile email, state, nonce, challenge)</text>
+
+        <!-- Step 5 OP box -->
+        <rect x="372" y="121" width="222" height="29" rx="3" fill="#f0fdfa" stroke="#5eead4"/>
+        <text x="483" y="131" text-anchor="middle" font-size="7.1" fill="#115e59">5. Valida client_id e redirect_uri (erro 400 sem redirecionar)</text>
+        <text x="483" y="139.5" text-anchor="middle" font-size="7.1" fill="#115e59">Login Argon2id + Rate Limit (5/300s) → Consentimento explícito</text>
+        <text x="483" y="147.5" text-anchor="middle" font-size="6.9" fill="#115e59">(senha trafega exclusivamente entre Navegador e OP)</text>
+
+        <!-- Step 6 -->
+        <line x1="483" y1="164" x2="80" y2="164" stroke="#0f766e" stroke-width="1.35" stroke-dasharray="4 2" marker-end="url(#arr-g)"/>
+        <text x="280" y="159" text-anchor="middle" font-size="7.5" fill="#0f766e">6. 302 → redirect_uri?code=&lt;uso único, TTL≤60s&gt;&amp;state=&lt;idêntico&gt;</text>
+
+        <!-- Step 7 -->
+        <line x1="76" y1="183" x2="269" y2="183" stroke="#0f3d75" stroke-width="1.35" marker-end="url(#arr-b)"/>
+        <text x="174" y="178" text-anchor="middle" font-size="7.5" font-weight="600" fill="#0f172a">7. GET /callback?code=...&amp;state=... (+ oidc_flow)</text>
+
+        <!-- Step 8 -->
+        <rect x="171" y="189" width="204" height="21" rx="3" fill="#fef3c7" stroke="#f59e0b"/>
+        <text x="273" y="198.5" text-anchor="middle" font-size="7.1" font-weight="600" fill="#92400e">8. Consome fluxo e valida state (timing-safe)</text>
+        <text x="273" y="206.5" text-anchor="middle" font-size="6.9" fill="#92400e">Se divergir ou ausente → HTTP 400 e aborta antes de /token</text>
+
+        <!-- Step 9 back-channel -->
+        <line x1="273" y1="224" x2="479" y2="224" stroke="#0f766e" stroke-width="1.4" marker-end="url(#arr-g)"/>
+        <text x="378" y="219" text-anchor="middle" font-size="7.3" font-weight="600" fill="#0f172a">9. Discovery + POST /token (back-channel, retries=0)</text>
+
+        <line x1="483" y1="243" x2="277" y2="243" stroke="#0f766e" stroke-width="1.35" stroke-dasharray="4 2" marker-end="url(#arr-g)"/>
+        <text x="378" y="238" text-anchor="middle" font-size="7.0" fill="#0f766e">Valida client_secret, code, PKCE → 200 (id_token RS256, no-store)</text>
+
+        <!-- Step 10 JWKS -->
+        <line x1="273" y1="262" x2="665" y2="262" stroke="#6d28d9" stroke-width="1.35" marker-end="url(#arr-p)"/>
+        <text x="470" y="257" text-anchor="middle" font-size="7.4" font-weight="600" fill="#5b21b6">10. GET /jwks.json → obtém chave pública RSA correspondente ao kid</text>
+
+        <!-- Step 11 -->
+        <rect x="166" y="268" width="214" height="29" rx="3" fill="#eff6ff" stroke="#3b82f6"/>
+        <text x="273" y="278" text-anchor="middle" font-size="7.1" font-weight="600" fill="#1e3a8a">11. Decompõe ID Token no log + Checklist 4.3 (itens 1–8)</text>
+        <text x="273" y="286.5" text-anchor="middle" font-size="7.0" fill="#1e3a8a">Lista fixa RS256, assinatura, iss, aud, azp, exp, iat, nonce</text>
+        <text x="273" y="294.5" text-anchor="middle" font-size="6.9" fill="#1e3a8a">Qualquer falha → OidcAuthenticationError (HTTP 400)</text>
+
+        <!-- Step 12 -->
+        <line x1="273" y1="312" x2="665" y2="312" stroke="#6d28d9" stroke-width="1.35" marker-end="url(#arr-p)"/>
+        <text x="470" y="307" text-anchor="middle" font-size="7.4" font-weight="600" fill="#5b21b6">12. GET /userinfo (Authorization: Bearer &lt;access_token&gt;) → valida sub idêntico (#10)</text>
+
+        <!-- Step 13 -->
+        <rect x="166" y="318" width="214" height="29" rx="3" fill="#dcfce7" stroke="#22c55e"/>
+        <text x="273" y="328" text-anchor="middle" font-size="7.1" font-weight="600" fill="#166534">13. Vínculo local (oidc_issuer, oidc_sub) → id (#9)</text>
+        <text x="273" y="336.5" text-anchor="middle" font-size="6.95" fill="#166534">Ausente → HTTP 403 (fail-closed). Presente → rotaciona</text>
+        <text x="273" y="344.5" text-anchor="middle" font-size="6.95" fill="#166534">session_id (256 bits) em sessions e sincroniza role validado</text>
+
+        <!-- Step 14 -->
+        <line x1="273" y1="362" x2="80" y2="362" stroke="#0f3d75" stroke-width="1.35" stroke-dasharray="4 2" marker-end="url(#arr-b)"/>
+        <text x="175" y="357" text-anchor="middle" font-size="7.1" fill="#0f172a">14. 302 → / (Set-Cookie: session_id HttpOnly)</text>
+
+        <!-- Step 15 -->
+        <line x1="76" y1="382" x2="269" y2="382" stroke="#0f3d75" stroke-width="1.35" marker-end="url(#arr-b)"/>
+        <text x="174" y="377" text-anchor="middle" font-size="7.3" font-weight="600" fill="#0f172a">15. GET /admin → RBAC no servidor (200 | 403)</text>
+      </svg>
+    </div>
+
+    <h3 style="margin-top:4px;">Tabela Local de Usuários (Item 4.1 — <code>app/storage.py:16-25</code>)</h3>
+    <table class="compact-table">
+      <thead>
+        <tr>
+          <th>Coluna</th><th>Tipo / Restrição</th><th>Finalidade no Sistema</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><code>id</code></td><td><code>INTEGER PRIMARY KEY</code></td><td>Identificador interno na aplicação; gravado em <code>sessions.user_id</code>.</td></tr>
+        <tr><td><code>user_name</code></td><td><code>TEXT NOT NULL UNIQUE</code></td><td>Nome de exibição do usuário (nunca usado como chave de vínculo OIDC).</td></tr>
+        <tr><td><code>full_name</code></td><td><code>TEXT NOT NULL</code></td><td>Nome completo exibido na interface autenticada.</td></tr>
+        <tr><td><code>oidc_issuer</code> + <code>oidc_sub</code></td><td><code>TEXT NOT NULL</code>, <code>UNIQUE (oidc_issuer, oidc_sub)</code></td><td>Chave composta de vínculo com o OpenID Provider (OIDC Core §5.7).</td></tr>
+        <tr><td><code>role</code></td><td><code>TEXT CHECK (role IN ('user','admin'))</code></td><td>Perfil de autorização revalidado no servidor em cada requisição a <code>/admin</code>.</td></tr>
+        <tr><td><code>created_at</code></td><td><code>TEXT DEFAULT CURRENT_TIMESTAMP</code></td><td>Timestamp de auditoria do registro local.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <footer class="page-footer">
+    <span>UNOESC • 33506 Cyber Security — Avaliação A1/3 (OAuth 2.0 + OIDC, Opção 1)</span>
+    <span>Pedro Diniz &amp; Luiz Felipe Kauê da Silva — Página 1 de 6</span>
+  </footer>
+</section>
+
+<!-- ====================================================================== -->
+<!-- PÁGINA 2: ID TOKEN REAL DECODIFICADO E LOGS DE EXECUÇÃO                -->
+<!-- ====================================================================== -->
+<section class="page">
+  <div class="page-body">
+    <h2><span class="sec-num">3</span> ID Token Real Decodificado (Execução Real — 26/11/2026)</h2>
+    <p>
+      As três partes do JWS compacto abaixo foram capturadas diretamente da execução real dos dois servidores Flask (<code>auth_server</code> em <code>http://localhost:8001</code> e <code>app</code> em <code>http://localhost:8000</code>, com login do usuário <code>admin</code> às 19:00:24 em 26/11/2026). Nenhum dado foi fabricado; credenciais, senhas, <code>client_secret</code> e chaves privadas não constam neste documento.
+    </p>
+
+    <div class="grid-2-asym">
+      <div>
+        <h3>3.1 Cabeçalho (Header — Base64URL decodificado)</h3>
+        <pre>{
+  "alg": "RS256",
+  "kid": "rsa-2026-11-bedae646",
+  "typ": "JWT"
+}</pre>
+        <h3>3.2 Chave Pública Correspondente (<code>GET /jwks.json</code>)</h3>
+        <pre>{
+  "keys": [
+    {
+      "alg": "RS256",
+      "e": "AQAB",
+      "kid": "rsa-2026-11-bedae646",
+      "kty": "RSA",
+      "n": "opx2q1EZrQgVd9dLMt5U8oGmTDD-o85p1gDoP6ITDnr0GR3rROlFDrTiTBSvX6T-BFbBAtf5bq0rUgGrttvTPhQ1Eqk6WatGzn4-BuCHTgVspmBY7uBfbLif0dV2gE8QLK0jVgitfgRqmVGovz_qsyeXqG5CyEcmrxl1Q7952AdE7fZZlc5y5f0hMKnRvTMNKAhCewb3_J_98B7U4gO7caJdPpTtvAjPmqIO5kVb0BeFw1-br-g45AnUraciVXg0ZbWZiHSoqilUhrpkhbMePjhTMtXlo6wosbdLyeUzUeagQnbTliBZxZpavg2vHexNR5T81xh_lYRWGDubSr8RUQ",
+      "use": "sig"
+    }
+  ]
+}</pre>
+      </div>
+      <div>
+        <h3>3.3 Payload (Claims Validados — Base64URL decodificado)</h3>
+        <pre>{
+  "iss": "http://localhost:8001",
+  "sub": "1000000001",
+  "aud": "app-cybersecurity-33506",
+  "exp": 1795731322,
+  "iat": 1795730422,
+  "nonce": "Vc-DJRfUhUYA0Rq-INGmSHFuH0vJtVK6m7i8llxO_EA",
+  "azp": "app-cybersecurity-33506",
+  "name": "Administrador (Demo)",
+  "email": "admin@unoesc.local",
+  "email_verified": true,
+  "role": "admin"
+}</pre>
+        <p class="small-note" style="margin-top:2px;">
+          Observe <code>exp - iat = 1795731322 - 1795730422 = 900 s</code> (15 minutos), <code>iss</code> idêntico ao <code>issuer</code> da descoberta e todos os 11 claims exigidos na Seção 2.5 presentes.
+        </p>
+        <h3>3.4 Resposta Real de <code>GET /userinfo</code> (Bearer Access Token)</h3>
+        <pre>{
+  "sub": "1000000001",
+  "name": "Administrador (Demo)",
+  "email": "admin@unoesc.local",
+  "email_verified": true
+}</pre>
+      </div>
+    </div>
+
+    <h3>3.5 Assinatura Digital (Signature — RS256 / RSA-2048, 256 bytes)</h3>
+    <pre>Algoritmo: RSASSA-PKCS1-v1_5 com SHA-256 (RS256) | Tamanho decodificado: 256 bytes (2048 bits)
+Entrada assinada: BASE64URL(header) + "." + BASE64URL(payload) | Chave de verificação: kid="rsa-2026-11-bedae646"
+
+Base64URL (342 caracteres):
+mR4hwLj8UvmGqv7yUnWP5Vx-lm4OkIwGXHkNyGnJXE3pQdzuK5MeXE70wSL1x3vHDhRs1O9iQ4lg9vIXrR1WGi1DgdAA3YajvnVoSQtFX25vkEXMyk2zHtYZ5j_qjZj_DxhQyFZ8JHYqbzwvi0p_U_9rOAkewNrHirzzAZ2c9lS_3sWpdnbh7ebQTLtVjfT77xQiY1WoQ9X4UBOL9ZH391SYf8NeWl7DyzVdZi6Cs8qMnRi4JAR5SPLoXfUnACNyClkdvnMdy6MAwZ2BfeklBobLXFoi5OnqGRvx_BBQ_hrDHYB7-X3QP-iQYSOpg_bI8BPkkd2yyjpWlbIEXLtkiA
+
+Hexadecimal (prefixo dos primeiros 32 bytes decodificados):
+991e21c0b8fc52f986aafef252758fe55c7e966e0e908c065c790dc869c95c4d...</pre>
+
+    <h3>3.6 Evidência de Execução Real nos Logs dos Servidores (Item 4.2.7 + Mascaramento de URLs)</h3>
+    <p>
+      Durante a execução ponta a ponta, a Aplicação Cliente registra a decomposição do ID Token no log do servidor em nível <code>INFO</code> (<code>app/oidc.py:251-257</code>) e ambos os servidores mascaram query strings sensíveis (<code>/authorize?[REDACTED]</code> e <code>/callback?[REDACTED]</code>) para evitar vazamento de <code>code</code> e <code>state</code>:
+    </p>
+    <pre class="code-light"># Log real do Servidor de Autorizacao (auth_server, porta 8001)
+127.0.0.1 - - [26/Nov/2026 19:00:11] "GET /authorize?[REDACTED] HTTP/1.1" 200 -
+127.0.0.1 - - [26/Nov/2026 19:00:13] "POST /authorize HTTP/1.1" 200 -
+127.0.0.1 - - [26/Nov/2026 19:00:16] "POST /authorize HTTP/1.1" 302 -
+127.0.0.1 - - [26/Nov/2026 19:00:20] "GET /.well-known/openid-configuration HTTP/1.1" 200 -
+127.0.0.1 - - [26/Nov/2026 19:00:22] "POST /token HTTP/1.1" 200 -
+127.0.0.1 - - [26/Nov/2026 19:00:24] "GET /jwks.json HTTP/1.1" 200 -
+127.0.0.1 - - [26/Nov/2026 19:00:26] "GET /userinfo HTTP/1.1" 200 -
+
+# Log real da Aplicacao Cliente (app, porta 8000) — login admin (200), logout (303->401) e login usuario (403)
+127.0.0.1 - - [26/Nov/2026 19:00:09] "GET /login HTTP/1.1" 302 -
+[2026-11-26 19:00:24,746] INFO in oidc: ID Token decomposto | header={"alg": "RS256", "kid": "rsa-2026-11-bedae646", "typ": "JWT"} | payload={"aud": "app-cybersecurity-33506", "azp": "app-cybersecurity-33506", "email": "admin@unoesc.local", "email_verified": true, "exp": 1795731322, "iat": 1795730422, "iss": "http://localhost:8001", "name": "Administrador (Demo)", "nonce": "Vc-DJRfUhUYA0Rq-INGmSHFuH0vJtVK6m7i8llxO_EA", "role": "admin", "sub": "1000000001"} | signature_bytes=256 signature_b64=mR4hwLj8UvmGqv7yUnWP5Vx-...
+127.0.0.1 - - [26/Nov/2026 19:00:26] "GET /callback?[REDACTED] HTTP/1.1" 302 -
+127.0.0.1 - - [26/Nov/2026 19:00:30] "GET /admin HTTP/1.1" 200 -
+127.0.0.1 - - [26/Nov/2026 19:00:32] "POST /logout HTTP/1.1" 303 -
+127.0.0.1 - - [26/Nov/2026 19:00:35] "GET /admin HTTP/1.1" 401 -
+[2026-11-26 19:00:52,358] INFO in oidc: ID Token decomposto | header={"alg": "RS256", "kid": "rsa-2026-11-bedae646", "typ": "JWT"} | payload={..., "role": "user", "sub": "1000000002"} | signature_bytes=256 signature_b64=RG4gHrko6TGpop6DcIzZTmt...
+127.0.0.1 - - [26/Nov/2026 19:00:54] "GET /callback?[REDACTED] HTTP/1.1" 302 -
+127.0.0.1 - - [26/Nov/2026 19:00:56] "GET /admin HTTP/1.1" 403 -</pre>
+
+    <div class="callout">
+      <strong>Cookie de sessão emitido no callback (execução real):</strong>
+      <code>session_id=&lt;43 chars / 256 bits aleatórios&gt;; Max-Age=28800; HttpOnly; Path=/; SameSite=Lax</code> (acrescido de <code>Secure</code> quando servido em HTTPS, via <code>"secure": request.is_secure</code> em <code>app/routes.py:16</code>), simultâneo ao descarte imediato do cookie temporário <code>oidc_flow</code> (<code>Max-Age=0</code>).
+    </div>
+  </div>
+  <footer class="page-footer">
+    <span>UNOESC • 33506 Cyber Security — Avaliação A1/3 (OAuth 2.0 + OIDC, Opção 1)</span>
+    <span>Pedro Diniz &amp; Luiz Felipe Kauê da Silva — Página 2 de 6</span>
+  </footer>
+</section>
+
+<!-- ====================================================================== -->
+<!-- PÁGINA 3: CHECKLIST DO ITEM 4.3 (10/10 COM ARQUIVO:LINHA E SAÍDA)      -->
+<!-- ====================================================================== -->
+<section class="page">
+  <div class="page-body">
+    <h2><span class="sec-num">4</span> Checklist de Validação do ID Token (Item 4.3 — 10/10 Concluídos)</h2>
+    <p>
+      Cada verificação exigida no item 4.3 do enunciado é executada no back-end da Aplicação Cliente antes da criação da sessão local. A tabela abaixo mapeia a referência normativa, a implementação exata (<code>arquivo:linha</code>) e a evidência real obtida no fluxo ao vivo e na suíte automatizada.
+    </p>
+
+    <table class="chk-table">
+      <thead>
+        <tr>
+          <th class="center" style="width:4%">#</th>
+          <th style="width:27%">Verificação e Referência</th>
+          <th style="width:22%">Implementação (<code>arquivo:linha</code>)</th>
+          <th class="center" style="width:7%">Status</th>
+          <th style="width:40%">Evidência Real (Fluxo ao Vivo e Testes)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="center"><strong>1</strong></td>
+          <td>Assinatura conferida com chave pública do emissor por <code>kid</code>; chave não encontrada deve ser erro.<br><span class="small-note">OIDC Core §3.1.3.7 (6-7); RFC 8725 §3.1</span></td>
+          <td><code>app/oidc.py:221-231</code><br><code>app/oidc.py:267-296</code></td>
+          <td class="center"><span class="badge-ok">OK</span></td>
+          <td>Fluxo real: <code>kid=rsa-2026-11-bedae646</code> localizado em <code>/jwks.json</code> e verificado via RSA-2048.<br>Negativo: <code>test_neg_12</code> (<code>Signature verification failed</code>) e <code>test_kid_desconhecido...</code> (<code>Chave publica nao encontrada no JWKS</code>).</td>
+        </tr>
+        <tr>
+          <td class="center"><strong>2</strong></td>
+          <td>Algoritmo na lista fixa aceita; <code>alg="none"</code> é sempre rejeitado.<br><span class="small-note">RFC 8725 §2.1, §3.1</span></td>
+          <td><code>app/oidc.py:20</code><br><code>app/oidc.py:262-264</code><br><code>app/oidc.py:284</code></td>
+          <td class="center"><span class="badge-ok">OK</span></td>
+          <td>Constante fixa <code>ALLOWED_ID_TOKEN_ALGORITHMS = ("RS256",)</code>.<br>Fluxo real: <code>alg=RS256</code>.<br>Negativos: <code>test_neg_01</code> (<code>Algoritmo de ID Token rejeitado: 'none'.</code>) e <code>test_neg_02</code> (<code>rejeitado: 'HS256'.</code>).</td>
+        </tr>
+        <tr>
+          <td class="center"><strong>3</strong></td>
+          <td><code>iss</code> idêntico ao <code>issuer</code> publicado na descoberta.<br><span class="small-note">OIDC Core §3.1.3.7 (2)</span></td>
+          <td><code>app/oidc.py:181-182</code><br><code>app/oidc.py:316-318</code></td>
+          <td class="center"><span class="badge-ok">OK</span></td>
+          <td>Comparação <code>hmac.compare_digest(iss, expected_issuer)</code>.<br>Fluxo real: <code>iss = "http://localhost:8001"</code>.<br>Negativo: <code>test_neg_04</code> (<code>Claim iss do ID Token diverge do emissor esperado.</code>).</td>
+        </tr>
+        <tr>
+          <td class="center"><strong>4</strong></td>
+          <td><code>aud</code> contém o <code>client_id</code> da aplicação.<br><span class="small-note">OIDC Core §3.1.3.7 (3)</span></td>
+          <td><code>app/oidc.py:329-338</code></td>
+          <td class="center"><span class="badge-ok">OK</span></td>
+          <td>Aceita string ou lista de strings; exige <code>expected_client_id in aud_list</code>.<br>Fluxo real: <code>aud = "app-cybersecurity-33506"</code>.<br>Negativo: <code>test_neg_03</code> (<code>Claim aud do ID Token nao contem o client_id da aplicacao.</code>).</td>
+        </tr>
+        <tr>
+          <td class="center"><strong>5</strong></td>
+          <td>Se <code>aud</code> tiver mais de um valor, <code>azp</code> é validado.<br><span class="small-note">OIDC Core §3.1.3.7 (4-5)</span></td>
+          <td><code>app/oidc.py:349-355</code></td>
+          <td class="center"><span class="badge-ok">OK</span></td>
+          <td>Exige <code>azp == client_id</code> quando <code>len(aud_list) &gt; 1</code> ou quando <code>azp</code> está presente.<br>Fluxo real: <code>azp = "app-cybersecurity-33506"</code>.<br>Teste: <code>test_azp_com_multiplos_aud_e_mascara_log_callback</code> (<code>PASSED</code>).</td>
+        </tr>
+        <tr>
+          <td class="center"><strong>6</strong></td>
+          <td><code>exp</code> está no futuro, com tolerância máxima de poucos minutos.<br><span class="small-note">OIDC Core §3.1.3.7 (9)</span></td>
+          <td><code>app/oidc.py:368-372</code><br><code>app/config.py:27</code></td>
+          <td class="center"><span class="badge-ok">OK</span></td>
+          <td>Rejeita se <code>exp &lt; now - 60</code> (skew máximo de 60s).<br>Fluxo real: <code>exp=1795731322</code> (900s à frente).<br>Negativo: <code>test_neg_05</code> (<code>ID Token expirado (claim exp vencido).</code>).</td>
+        </tr>
+        <tr>
+          <td class="center"><strong>7</strong></td>
+          <td><code>iat</code> não está no futuro.<br><span class="small-note">OIDC Core §3.1.3.7 (10)</span></td>
+          <td><code>app/oidc.py:383-387</code></td>
+          <td class="center"><span class="badge-ok">OK</span></td>
+          <td>Rejeita se <code>iat &gt; now + 60</code>.<br>Fluxo real: <code>iat=1795730422</code>.<br>Negativo: <code>test_neg_06</code> (<code>Claim iat do ID Token esta no futuro.</code>).</td>
+        </tr>
+        <tr>
+          <td class="center"><strong>8</strong></td>
+          <td><code>nonce</code> idêntico ao enviado na requisição.<br><span class="small-note">OIDC Core §3.1.3.7 (11)</span></td>
+          <td><code>app/oidc.py:398-400</code></td>
+          <td class="center"><span class="badge-ok">OK</span></td>
+          <td>Comparação <code>hmac.compare_digest(nonce, expected_nonce)</code>.<br>Fluxo real: <code>nonce=Vc-DJRfUhUYA0Rq-INGmSHFuH0vJtVK6m7i8llxO_EA</code> (correspondência exata).<br>Negativo: <code>test_neg_07</code> (<code>Claim nonce do ID Token diverge do valor enviado.</code>).</td>
+        </tr>
+        <tr>
+          <td class="center"><strong>9</strong></td>
+          <td><code>sub</code> localizado na tabela e convertido no <code>id</code> interno.<br><span class="small-note">OIDC Core §5.7</span></td>
+          <td><code>app/storage.py:117-122</code><br><code>app/routes.py:121-139</code></td>
+          <td class="center"><span class="badge-ok">OK</span></td>
+          <td>Consulta <code>WHERE oidc_issuer = ? AND oidc_sub = ?</code>.<br>Fluxo real: <code>sub="1000000001"</code> → <code>id=1</code> (admin); <code>sub="1000000002"</code> → <code>id=2</code> (user).<br>Ausente → HTTP 403 (<code>test_kid_desconhecido_sub_nao_cadastrado...</code>).</td>
+        </tr>
+        <tr>
+          <td class="center"><strong>10</strong></td>
+          <td>Se <code>/userinfo</code> for usado, o <code>sub</code> devolvido é igual ao do ID Token.<br><span class="small-note">OIDC Core §5.3.2</span></td>
+          <td><code>app/oidc.py:417-445</code><br><code>app/oidc.py:515-525</code></td>
+          <td class="center"><span class="badge-ok">OK</span></td>
+          <td>Chamada obrigatória com <code>Authorization: Bearer &lt;access_token&gt;</code>.<br>Fluxo real: <code>userinfo["sub"] == "1000000001" == id_token["sub"]</code>.<br>Divergente → rejeitado em <code>test_kid_desconhecido_sub_nao_cadastrado...</code>.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 style="margin-top:4px;">Verificações Complementares de Protocolo (Seções 2 e 4)</h3>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Descoberta, JWKS e Rotação de Chaves</div>
+        <p style="margin-bottom:0; font-size:7.4pt; line-height:1.27;">
+          <code>test_discovery_jwks_e_rotacao_de_chave_rsa</code> comprova que <code>/.well-known/openid-configuration</code> expõe todos os metadados do item 2.1 e que <code>KeyManager.rotate_key()</code> (<code>auth_server/keys.py:66-76</code>) adiciona nova chave ativa mantendo o <code>kid</code> anterior em <code>/jwks.json</code>, validando simultaneamente tokens antigos e novos na transição.
+        </p>
+      </div>
+      <div class="card">
+        <div class="card-title">Sessão Local, Rotação e Erros no Callback</div>
+        <p style="margin-bottom:0; font-size:7.4pt; line-height:1.27;">
+          <code>test_implicit_proibido_callback_access_denied_e_rotacao_sessao</code> comprova rejeição de <code>response_type=token</code> (HTTP 400 sem redirecionar), tratamento amigável de <code>error=access_denied</code> no callback (HTTP 400 sem criar sessão, item 4.6) e rotação obrigatória do <code>session_id</code> no login invalidando o anterior (item 4.4).
+        </p>
+      </div>
+    </div>
+  </div>
+  <footer class="page-footer">
+    <span>UNOESC • 33506 Cyber Security — Avaliação A1/3 (OAuth 2.0 + OIDC, Opção 1)</span>
+    <span>Pedro Diniz &amp; Luiz Felipe Kauê da Silva — Página 3 de 6</span>
+  </footer>
+</section>
+
+<!-- ====================================================================== -->
+<!-- PÁGINA 4: TESTES NEGATIVOS OBRIGATÓRIOS — CASOS 1 A 9                  -->
+<!-- ====================================================================== -->
+<section class="page">
+  <div class="page-body">
+    <h2><span class="sec-num">5</span> Testes Negativos Obrigatórios (Item 5 — Casos 1 a 9)</h2>
+    <p>
+      Todos os 15 cenários negativos obrigatórios da Seção 5 estão automatizados em <code>tests/test_security_suite.py</code> e foram executados sobre a implementação real. As colunas abaixo apresentam o resultado esperado, o caso de teste correspondente e a saída real capturada na execução.
+    </p>
+
+    <table class="neg-table">
+      <thead>
+        <tr>
+          <th class="center" style="width:4%">#</th>
+          <th style="width:24%">Cenário de Ataque ou Falha</th>
+          <th style="width:15%">Esperado</th>
+          <th style="width:22%">Teste / Mecanismo</th>
+          <th style="width:35%">Evidência Real de Execução (Exceção / HTTP / Log)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="center"><strong>1</strong></td>
+          <td>ID Token com <code>alg="none"</code> (assinatura vazia)</td>
+          <td>Rejeitado</td>
+          <td><code>test_neg_01_id_token_alg_none_rejeitado</code><br><code>app/oidc.py:263</code></td>
+          <td><code>PASSED</code> — Exceção real:<br><code>OidcAuthenticationError: Algoritmo de ID Token rejeitado: 'none'.</code></td>
+        </tr>
+        <tr>
+          <td class="center"><strong>2</strong></td>
+          <td>ID Token reassinado em <code>HS256</code> usando a chave pública RSA (PEM) como segredo HMAC</td>
+          <td>Rejeitado</td>
+          <td><code>test_neg_02_id_token_reassinado_hs256_com_chave_publica_rejeitado</code><br><code>app/oidc.py:20,263,284</code></td>
+          <td><code>PASSED</code> — Exceção real:<br><code>OidcAuthenticationError: Algoritmo de ID Token rejeitado: 'HS256'.</code></td>
+        </tr>
+        <tr>
+          <td class="center"><strong>3</strong></td>
+          <td>ID Token assinado validamente em RS256, mas com <code>aud="outro-client-id"</code></td>
+          <td>Rejeitado</td>
+          <td><code>test_neg_03_id_token_aud_outro_client_id_rejeitado</code><br><code>app/oidc.py:337-338</code></td>
+          <td><code>PASSED</code> — Exceção real:<br><code>OidcAuthenticationError: Claim aud do ID Token nao contem o client_id da aplicacao.</code></td>
+        </tr>
+        <tr>
+          <td class="center"><strong>4</strong></td>
+          <td>ID Token assinado validamente, mas com <code>iss="https://attacker.example"</code></td>
+          <td>Rejeitado</td>
+          <td><code>test_neg_04_id_token_iss_diferente_rejeitado</code><br><code>app/oidc.py:317-318</code></td>
+          <td><code>PASSED</code> — Exceção real:<br><code>OidcAuthenticationError: Claim iss do ID Token diverge do emissor esperado.</code></td>
+        </tr>
+        <tr>
+          <td class="center"><strong>5</strong></td>
+          <td>ID Token com <code>exp</code> vencido (<code>now - 300s</code>, fora da tolerância de 60s)</td>
+          <td>Rejeitado</td>
+          <td><code>test_neg_05_id_token_exp_vencido_rejeitado</code><br><code>app/oidc.py:371-372</code></td>
+          <td><code>PASSED</code> — Exceção real:<br><code>OidcAuthenticationError: ID Token expirado (claim exp vencido).</code></td>
+        </tr>
+        <tr>
+          <td class="center"><strong>6</strong></td>
+          <td>ID Token com <code>iat</code> no futuro (<code>now + 600s</code>)</td>
+          <td>Rejeitado</td>
+          <td><code>test_neg_06_id_token_iat_no_futuro_rejeitado</code><br><code>app/oidc.py:386-387</code></td>
+          <td><code>PASSED</code> — Exceção real:<br><code>OidcAuthenticationError: Claim iat do ID Token esta no futuro.</code></td>
+        </tr>
+        <tr>
+          <td class="center"><strong>7</strong></td>
+          <td>ID Token com <code>nonce="nonce-atacante-replay"</code> divergente do enviado</td>
+          <td>Rejeitado</td>
+          <td><code>test_neg_07_id_token_nonce_diferente_rejeitado</code><br><code>app/oidc.py:399-400</code></td>
+          <td><code>PASSED</code> — Exceção real:<br><code>OidcAuthenticationError: Claim nonce do ID Token diverge do valor enviado.</code></td>
+        </tr>
+        <tr>
+          <td class="center"><strong>8</strong></td>
+          <td><code>GET /callback</code> com <code>state</code> divergente ou ausente</td>
+          <td>Fluxo abortado antes da troca do <code>code</code></td>
+          <td><code>test_neg_08_callback_state_divergente_ou_ausente_aborta_antes_da_troca</code><br><code>app/routes.py:96-98</code></td>
+          <td><code>PASSED</code> — <code>authenticate()</code> não foi invocado (<code>called=False</code>).<br>Divergente → <code>HTTP 400</code>; Ausente → <code>HTTP 400</code>.<br>Log: <code>WARNING in routes: Callback rejeitado por estado ausente, expirado ou invalido.</code></td>
+        </tr>
+        <tr>
+          <td class="center"><strong>9</strong></td>
+          <td>Reutilização do mesmo <code>authorization_code</code> em <code>POST /token</code></td>
+          <td><code>invalid_grant</code> e revogação dos tokens</td>
+          <td><code>test_neg_09_reutilizacao_authorization_code_revoga_tokens</code><br><code>auth_server/routes.py:571-580</code></td>
+          <td><code>PASSED</code> — 1ª troca: <code>HTTP 200</code> (<code>/userinfo</code> = 200, refresh ativo).<br>2ª troca (replay): <code>HTTP 400 {"error": "invalid_grant", "error_description": "Authorization code ja utilizado; todos os tokens associados foram revogados."}</code>.<br>Após replay: <code>/userinfo</code> → <code>HTTP 401</code> + <code>WWW-Authenticate: Bearer ... error_description="Access token revogado ou expirado."</code>; <code>refresh_ativo=False</code>.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout">
+      <strong>Nota técnica sobre o Caso #9 (RFC 6749 §4.1.2):</strong> cada <code>authorization_code</code> gerado em <code>auth_server/storage.py:455-492</code> recebe um <code>grant_id</code> único propagado tanto para <code>access_tokens</code> quanto para <code>refresh_tokens</code>. O consumo do código é atômico (<code>UPDATE authorization_codes SET used_at = ? WHERE code_hash = ? AND used_at IS NULL</code>); qualquer tentativa subsequente executa <code>revoke_grant_tokens(grant_id)</code>, invalidando imediatamente todos os tokens derivados daquela concessão.
+    </div>
+  </div>
+  <footer class="page-footer">
+    <span>UNOESC • 33506 Cyber Security — Avaliação A1/3 (OAuth 2.0 + OIDC, Opção 1)</span>
+    <span>Pedro Diniz &amp; Luiz Felipe Kauê da Silva — Página 4 de 6</span>
+  </footer>
+</section>
+
+<!-- ====================================================================== -->
+<!-- PÁGINA 5: TESTES NEGATIVOS (CASOS 10 A 15) + SAÍDA REAL DO PYTEST      -->
+<!-- ====================================================================== -->
+<section class="page">
+  <div class="page-body">
+    <h2><span class="sec-num">5</span> Testes Negativos Obrigatórios (Continuação — Casos 10 a 15)</h2>
+
+    <table class="neg-table">
+      <thead>
+        <tr>
+          <th class="center" style="width:4%">#</th>
+          <th style="width:24%">Cenário de Ataque ou Falha</th>
+          <th style="width:15%">Esperado</th>
+          <th style="width:22%">Teste / Mecanismo</th>
+          <th style="width:35%">Evidência Real de Execução (Exceção / HTTP / Log)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="center"><strong>10</strong></td>
+          <td><code>code_verifier</code> incorreto em <code>POST /token</code> (não bate com SHA-256 do <code>code_challenge</code>)</td>
+          <td><code>invalid_grant</code></td>
+          <td><code>test_neg_10_code_verifier_incorreto_no_token</code><br><code>auth_server/routes.py:601-607</code></td>
+          <td><code>PASSED</code> — Resposta real:<br><code>HTTP 400 {"error": "invalid_grant", "error_description": "code_verifier nao corresponde ao code_challenge."}</code></td>
+        </tr>
+        <tr>
+          <td class="center"><strong>11</strong></td>
+          <td><code>redirect_uri</code> com barra final extra (<code>/callback/</code>), parâmetro adicional (<code>?extra=1</code>), subcaminho (<code>/subcaminho</code>) ou host diferente</td>
+          <td>Rejeitado (comparação exata, sem 302)</td>
+          <td><code>test_neg_11_redirect_uri_variacoes_rejeitadas_sem_redirecionar</code><br><code>auth_server/routes.py:207-216</code></td>
+          <td><code>PASSED</code> (4 variações parametrizadas) — Todas retornaram <code>HTTP 400</code> e <code>Location=None</code>.<br>Log: <code>WARNING in routes: Requisicao /authorize rejeitada por redirect_uri nao cadastrada.</code></td>
+        </tr>
+        <tr>
+          <td class="center"><strong>12</strong></td>
+          <td>Alteração de 1 único bit em 1 byte da assinatura do ID Token (<code>sig_bytes[10] ^= 0x01</code>)</td>
+          <td>Rejeitado</td>
+          <td><code>test_neg_12_um_byte_alterado_na_assinatura_do_id_token_rejeitado</code><br><code>app/oidc.py:280-296</code></td>
+          <td><code>PASSED</code> — Exceção real:<br><code>OidcAuthenticationError: Assinatura ou estrutura do ID Token invalida: Signature verification failed</code></td>
+        </tr>
+        <tr>
+          <td class="center"><strong>13</strong></td>
+          <td>Usuário autenticado com <code>role=user</code> tentando acessar <code>GET /admin</code></td>
+          <td><code>HTTP 403</code></td>
+          <td><code>test_neg_13_acesso_admin_com_role_user_retorna_403</code><br><code>app/routes.py:156-163</code></td>
+          <td><code>PASSED</code> — Fluxo completo <code>usuario</code> (<code>/callback</code> → <code>302</code>) seguido de <code>GET /admin</code> → <code>HTTP 403</code> (verificado no servidor, confirmado também no log ao vivo às 19:00:56).</td>
+        </tr>
+        <tr>
+          <td class="center"><strong>14</strong></td>
+          <td>Acesso a <code>GET /userinfo</code> sem token ou com access token expirado</td>
+          <td><code>HTTP 401</code> + <code>WWW-Authenticate</code></td>
+          <td><code>test_neg_14_userinfo_sem_token_ou_expirado_retorna_401_www_authenticate</code><br><code>auth_server/routes.py:694-712</code></td>
+          <td><code>PASSED</code> — Sem token: <code>HTTP 401</code> + <code>WWW-Authenticate: Bearer realm="userinfo", error="invalid_token", error_description="Bearer access token ausente."</code>.<br>Expirado: <code>HTTP 401</code> + <code>WWW-Authenticate: Bearer ... error_description="Access token invalido ou expirado."</code>.</td>
+        </tr>
+        <tr>
+          <td class="center"><strong>15</strong></td>
+          <td>Tentativas repetidas de login (força bruta) no formulário de <code>POST /authorize</code></td>
+          <td>Bloqueio por rate limiting</td>
+          <td><code>test_neg_15_tentativa_login_repetida_bloqueio_rate_limiting</code><br><code>auth_server/routes.py:357-381</code></td>
+          <td><code>PASSED</code> — Tentativas 1–5: <code>[401, 401, 401, 401, 401]</code> com mensagem genérica.<br>6ª tentativa (mesmo com senha correta): <code>HTTP 429</code> + <code>Retry-After: 299</code>.<br>Log: <code>WARNING in routes: Login bloqueado por rate limiting.</code></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>5.1 Saída Real Consolidada da Suíte Automatizada (<code>.\.venv\Scripts\python.exe -m pytest -v</code>)</h3>
+    <pre>platform win32 -- Python 3.12.10, pytest-8.4.2, pluggy-1.7.0
+collecting ... collected 24 items
+
+tests/test_security_suite.py::test_neg_01_id_token_alg_none_rejeitado PASSED                                       [  4%]
+tests/test_security_suite.py::test_neg_02_id_token_reassinado_hs256_com_chave_publica_rejeitado PASSED             [  8%]
+tests/test_security_suite.py::test_neg_03_id_token_aud_outro_client_id_rejeitado PASSED                            [ 12%]
+tests/test_security_suite.py::test_neg_04_id_token_iss_diferente_rejeitado PASSED                                  [ 16%]
+tests/test_security_suite.py::test_neg_05_id_token_exp_vencido_rejeitado PASSED                                    [ 20%]
+tests/test_security_suite.py::test_neg_06_id_token_iat_no_futuro_rejeitado PASSED                                  [ 25%]
+tests/test_security_suite.py::test_neg_07_id_token_nonce_diferente_rejeitado PASSED                                [ 29%]
+tests/test_security_suite.py::test_neg_08_callback_state_divergente_ou_ausente_aborta_antes_da_troca PASSED        [ 33%]
+tests/test_security_suite.py::test_neg_09_reutilizacao_authorization_code_revoga_tokens PASSED                     [ 37%]
+tests/test_security_suite.py::test_neg_10_code_verifier_incorreto_no_token PASSED                                  [ 41%]
+tests/test_security_suite.py::test_neg_11_redirect_uri_variacoes_rejeitadas_sem_redirecionar[.../callback/] PASSED [ 45%]
+tests/test_security_suite.py::test_neg_11_redirect_uri_variacoes_rejeitadas_sem_redirecionar[...?extra=1] PASSED   [ 50%]
+tests/test_security_suite.py::test_neg_11_redirect_uri_variacoes_rejeitadas_sem_redirecionar[.../subcaminho] PASSED[ 54%]
+tests/test_security_suite.py::test_neg_11_redirect_uri_variacoes_rejeitadas_sem_redirecionar[127.0.0.1:8000] PASSED[ 58%]
+tests/test_security_suite.py::test_neg_12_um_byte_alterado_na_assinatura_do_id_token_rejeitado PASSED               [ 62%]
+tests/test_security_suite.py::test_neg_13_acesso_admin_com_role_user_retorna_403 PASSED                            [ 66%]
+tests/test_security_suite.py::test_neg_14_userinfo_sem_token_ou_expirado_retorna_401_www_authenticate PASSED       [ 70%]
+tests/test_security_suite.py::test_neg_15_tentativa_login_repetida_bloqueio_rate_limiting PASSED                   [ 75%]
+tests/test_security_suite.py::test_fluxo_completo_admin_acessa_admin_e_exibe_id_token_decomposto PASSED            [ 79%]
+tests/test_security_suite.py::test_discovery_jwks_e_rotacao_de_chave_rsa PASSED                                    [ 83%]
+tests/test_security_suite.py::test_token_client_secret_basic_headers_e_erros_padronizados PASSED                   [ 87%]
+tests/test_security_suite.py::test_azp_com_multiplos_aud_e_mascara_log_callback PASSED                             [ 91%]
+tests/test_security_suite.py::test_kid_desconhecido_sub_nao_cadastrado_e_userinfo_sub_divergente PASSED            [ 95%]
+tests/test_security_suite.py::test_implicit_proibido_callback_access_denied_e_rotacao_sessao PASSED                [100%]
+
+============================= 24 passed in 16.51s =============================</pre>
+  </div>
+  <footer class="page-footer">
+    <span>UNOESC • 33506 Cyber Security — Avaliação A1/3 (OAuth 2.0 + OIDC, Opção 1)</span>
+    <span>Pedro Diniz &amp; Luiz Felipe Kauê da Silva — Página 5 de 6</span>
+  </footer>
+</section>
+
+<!-- ====================================================================== -->
+<!-- PÁGINA 6: JUSTIFICATIVA DE ALGORITMOS, TTLs, POLÍTICA SUB E AUDITORIA  -->
+<!-- ====================================================================== -->
+<section class="page">
+  <div class="page-body">
+    <h2><span class="sec-num">6</span> Justificativa de Algoritmos Criptográficos e Tempos de Vida</h2>
+
+    <h3>6.1 Escolhas Criptográficas</h3>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:20%">Mecanismo</th>
+          <th style="width:18%">Escolha Adotada</th>
+          <th style="width:62%">Justificativa Técnica e Referência</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Assinatura de Tokens (JWS)</strong></td>
+          <td><code>RS256</code> (RSA-2048 + SHA-256) com <code>kid</code></td>
+          <td>Criptografia assimétrica separa emissão (chave privada exclusiva do OP) de verificação (chave pública publicada em <code>/jwks.json</code>). Elimina compartilhamento de segredo simétrico (<code>HS256</code>) e permite rotação sem indisponibilidade mantendo o <code>kid</code> antigo durante a transição (OIDC Core §10.1; RFC 8725 §3.1).</td>
+        </tr>
+        <tr>
+          <td><strong>Lista Fixa de Algoritmos</strong></td>
+          <td><code>("RS256",)</code> hardcoded</td>
+          <td>O cliente jamais usa o cabeçalho <code>alg</code> do token recebido para selecionar o verificador, bloqueando <code>alg="none"</code> e confusão de algoritmo RS256→HS256 (RFC 8725 §2.1, §3.1).</td>
+        </tr>
+        <tr>
+          <td><strong>PKCE</strong></td>
+          <td><code>S256</code> (SHA-256 + Base64URL)</td>
+          <td>Impede que um interceptador do <code>authorization_code</code> no canal do navegador conclua a troca em <code>/token</code> sem o <code>code_verifier</code> de 256 bits retido no servidor. O método <code>plain</code> é recusado (RFC 7636; RFC 9700 §2.1).</td>
+        </tr>
+        <tr>
+          <td><strong>Hash de Senhas (OP)</strong></td>
+          <td><code>Argon2id</code> (<code>argon2-cffi</code>)</td>
+          <td>Algoritmo <em>memory-hard</em> com sal aleatório por usuário, resistente a ataques paralelos em GPU/ASIC e a canais laterais. Uma verificação fictícia (<code>_DUMMY_PASSWORD_HASH</code>) reduz vazamento de existência de conta por tempo de resposta (<code>auth_server/storage.py:18-19,280-282</code>).</td>
+        </tr>
+        <tr>
+          <td><strong>Hash de <code>client_secret</code> e Tokens no Banco</strong></td>
+          <td><code>scrypt</code> (secret) / <code>SHA-256</code> (codes e refresh)</td>
+          <td>O <code>client_secret</code> nunca é armazenado em texto claro (<code>scrypt</code> salgado + <code>hmac.compare_digest</code>). Códigos de autorização e refresh tokens são persistidos apenas como digest SHA-256 (<code>auth_server/storage.py:129-157</code>).</td>
+        </tr>
+        <tr>
+          <td><strong>Identificadores Aleatórios</strong></td>
+          <td>256 bits (<code>secrets.token_urlsafe(32)</code>)</td>
+          <td>Excede o mínimo de 128 bits exigido para <code>state</code>, <code>nonce</code>, <code>code_verifier</code>, <code>code</code>, <code>jti</code> e <code>session_id</code>, prevenindo adivinhação e colisão (RFC 6749 §10.10).</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>6.2 Tempos de Vida (TTLs) e Limites Operacionais</h3>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:25%">Artefato / Controle</th>
+          <th style="width:17%">Valor Adotado</th>
+          <th style="width:58%">Justificativa de Segurança e Configuração</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>authorization_code</code></td>
+          <td><strong>60 segundos</strong> (uso único)</td>
+          <td>Limite máximo exigido pelo enunciado (<code>AUTH_SERVER_CODE_TTL=60</code>, validado entre 1 e 60s em <code>auth_server/config.py:30</code>). Consumo atômico; replay revoga todos os tokens do <code>grant_id</code>.</td>
+        </tr>
+        <tr>
+          <td><code>id_token</code> e <code>access_token</code></td>
+          <td><strong>900 segundos</strong> (15 min)</td>
+          <td>Janela curta reduz impacto de eventual comprometimento do access token em <code>/userinfo</code> e segue a recomendação da Seção 2.5 (<code>AUTH_SERVER_TOKEN_TTL=900</code>).</td>
+        </tr>
+        <tr>
+          <td>Tolerância de relógio (<code>clock_skew</code>)</td>
+          <td><strong>60 segundos</strong></td>
+          <td>Absorve pequenas dessincronizações entre servidores sem enfraquecer a checagem de <code>exp</code> e <code>iat</code> (<code>OIDC_CLOCK_SKEW_SECONDS=60</code>).</td>
+        </tr>
+        <tr>
+          <td><code>refresh_token</code></td>
+          <td><strong>86.400 segundos</strong> (24 h)</td>
+          <td>Emitido vinculado ao <code>grant_id</code> e ao <code>client_id</code>, revogado imediatamente em replay de código (<code>AUTH_SERVER_REFRESH_TTL=86400</code>).</td>
+        </tr>
+        <tr>
+          <td>Sessão local (RP e OP)</td>
+          <td><strong>30 min</strong> inatividade / <strong>8 h</strong> absoluta</td>
+          <td>Equilibra usabilidade durante a jornada com expiração determinística mesmo sob uso contínuo (<code>SESSION_IDLE_TTL=1800</code>, <code>SESSION_TTL=28800</code>), com rotação no login e descarte no logout.</td>
+        </tr>
+        <tr>
+          <td>Fluxo pendente (<code>oidc_flow</code> / <code>authorize_requests</code>)</td>
+          <td><strong>300 segundos</strong> (5 min)</td>
+          <td>Tempo suficiente para digitar credenciais e consentir, com consumo único atômico (<code>DELETE ... RETURNING</code>) para impedir reutilização de estado.</td>
+        </tr>
+        <tr>
+          <td>Rate limiting no login (OP)</td>
+          <td><strong>5 falhas / 300 s</strong></td>
+          <td>Rastreia chaves por IP e por usuário (<code>auth_server/routes.py:357-381</code>), bloqueando força bruta com <code>HTTP 429</code> + <code>Retry-After</code> e mensagem genérica sem revelar existência do usuário.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2><span class="sec-num">7</span> Comportamento Quando <code>sub</code> Não Existe na Tabela Local (Item 4.2.10)</h2>
+    <div class="callout callout-warn">
+      <strong>Política adotada: Recusa explícita sem auto-provisionamento (<em>Fail-Closed</em>).</strong><br>
+      Somente após concluir integralmente as verificações criptográficas e de claims (itens 1–8 e 10 do checklist), a Aplicação Cliente busca o par <code>(oidc_issuer, oidc_sub)</code> na tabela <code>users</code> (<code>app/storage.py:117-122</code>). Quando o <code>sub</code> não está previamente cadastrado (<code>user is None</code> em <code>app/routes.py:121-124</code>), o login é <strong>recusado com HTTP 403</strong> (<code>"Esta identidade nao tem acesso a aplicacao."</code>), nenhuma conta é criada automaticamente, nenhuma sessão local é aberta e o evento é registrado em log. Essa decisão aplica o princípio do menor privilégio: o Provedor de Identidade comprova <em>quem</em> o usuário é (autenticação), mas o provisionamento local controla <em>quem pode entrar</em> na aplicação, evitando criação indevida de contas por identidades não autorizadas.
+    </div>
+
+    <h2><span class="sec-num">8</span> Conformidade com os DON'TS (Item 1.2) e Higiene do Repositório</h2>
+    <ul>
+      <li><strong>Proibição de ROPC e Implicit:</strong> <code>grant_type=password</code> retorna <code>400 unsupported_grant_type</code> e <code>response_type=token</code> retorna <code>400 invalid_request</code> (sem redirecionamento). A aplicação cliente nunca recebe, vê ou armazena senhas.</li>
+      <li><strong>Transporte Seguro (TLS):</strong> Ambos os serviços recusam tráfego sem HTTPS (<code>abort(400)</code>), exceto em loopback (<code>localhost</code>/<code>127.0.0.1</code>) quando <code>ALLOW_LOCAL_HTTP=true</code> exclusivamente para desenvolvimento (RFC 6749 §3.1/§3.2).</li>
+      <li><strong>Ausência de Segredos Versionados:</strong> Auditoria completa do repositório e do histórico Git confirmou ausência de <code>.env</code>, chaves privadas (<code>.pem</code>), bancos SQLite ou credenciais reais. O binário local <code>mkcert.exe.exe</code>, versionado por engano, foi removido e o padrão <code>mkcert*.exe</code> adicionado ao <code>.gitignore</code>.</li>
+      <li><strong>Referências Normativas Aplicadas:</strong> RFC 6749 (OAuth 2.0), RFC 6750 (Bearer), RFC 7636 (PKCE), RFC 7519 (JWT), RFC 8725 (JWT BCP), RFC 9700 (OAuth 2.0 Security BCP) e OpenID Connect Core 1.0.</li>
+    </ul>
+  </div>
+  <footer class="page-footer">
+    <span>UNOESC • 33506 Cyber Security — Avaliação A1/3 (OAuth 2.0 + OIDC, Opção 1)</span>
+    <span>Pedro Diniz &amp; Luiz Felipe Kauê da Silva — Página 6 de 6</span>
+  </footer>
+</section>
+
+</body>
+</html>

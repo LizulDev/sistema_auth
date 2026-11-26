@@ -1,7 +1,7 @@
 # Roteiro de Demonstração ao Vivo (até 10 minutos)
 
 - **Disciplina:** 33506 — Cyber Security (Avaliação A1/3 — OAuth 2.0 + OpenID Connect, Opção 1)
-- **Acadêmicos:** Pedro Diniz; Luiz Felipe Kauê da Silva; Domingos Chicanha Fonseca; Wesley Warken
+- **Acadêmicos:** Pedro Diniz; Luiz Felipe Kauê da Silva; Domingos Chicanha Fonseca; Wesley Warken; Gerson Alexandre Damazio
 - **Professor:** Odemir Moreira da Mata Junior
 - **Data:** 26/11/2026
 

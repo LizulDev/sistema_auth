@@ -2,16 +2,17 @@
 
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
-\usepackage[scaled=0.94]{helvet}
-\renewcommand{\familydefault}{\sfdefault}
+\usepackage[brazilian,shorthands=off]{babel}
 \usepackage{lmodern}
 \usepackage{microtype}
-\usepackage[a4paper,top=11mm,bottom=14mm,left=12.5mm,right=12.5mm,footskip=6.5mm]{geometry}
+\usepackage{indentfirst}
+\usepackage[a4paper,top=15mm,bottom=16mm,left=16mm,right=16mm,footskip=7mm]{geometry}
 \usepackage[table]{xcolor}
-\usepackage{tabularx}
+\usepackage{graphicx}
 \usepackage{booktabs}
+\usepackage{tabularx}
 \usepackage{array}
-\usepackage{colortbl}
+\usepackage{caption}
 \usepackage{enumitem}
 \usepackage{fancyhdr}
 \usepackage{lastpage}
@@ -19,84 +20,94 @@
 \usepackage{seqsplit}
 \usepackage[skins]{tcolorbox}
 \usepackage{tikz}
-\usetikzlibrary{arrows.meta,positioning,shapes.geometric}
+\usetikzlibrary{arrows.meta,positioning}
 \usepackage[hidelinks]{hyperref}
 
-% Paleta institucional (azul marinho academico + ardosia)
-\definecolor{navy}{HTML}{0F3D75}
-\definecolor{blueaccent}{HTML}{1D4ED8}
+% Paleta sobria alinhada ao modelo academico UNOESC
+\definecolor{unoescblue}{HTML}{1B3B6F}
+\definecolor{unoescgreen}{HTML}{2E8B3C}
 \definecolor{tealaccent}{HTML}{0F766E}
 \definecolor{purpleaccent}{HTML}{5B21B6}
 \definecolor{slate900}{HTML}{0F172A}
 \definecolor{slate700}{HTML}{334155}
 \definecolor{slate500}{HTML}{64748B}
-\definecolor{rowalt}{HTML}{F8FAFC}
-\definecolor{cardbg}{HTML}{F8FAFC}
-\definecolor{bordergray}{HTML}{CBD5E1}
-\definecolor{okbg}{HTML}{DCFCE7}
-\definecolor{okfg}{HTML}{166534}
-\definecolor{infobg}{HTML}{F0F9FF}
-\definecolor{infoborder}{HTML}{0284C7}
+\definecolor{codebg}{HTML}{F8FAFC}
+\definecolor{codeborder}{HTML}{CBD5E1}
 \definecolor{warnbg}{HTML}{FEFCE8}
 \definecolor{warnborder}{HTML}{CA8A04}
-\definecolor{darkcodebg}{HTML}{0F172A}
-\definecolor{darkcodefg}{HTML}{E2E8F0}
-\definecolor{lightcodebg}{HTML}{F8FAFC}
+\definecolor{infobg}{HTML}{F0F9FF}
+\definecolor{infoborder}{HTML}{0284C7}
+\definecolor{okbg}{HTML}{DCFCE7}
+\definecolor{okfg}{HTML}{166534}
 
-% Rodape e cabecalho de pagina
+% Legendas no padrao do modelo UNOESC ("Figura 1 - ...", "Tabela 1 - ...")
+\DeclareCaptionLabelSeparator{dash}{ - }
+\captionsetup{
+  format=hang,
+  labelformat=simple,
+  labelsep=dash,
+  singlelinecheck=false,
+  justification=centering,
+  position=top,
+  hypcap=false,
+  font=small,
+  labelfont=bf,
+  skip=3pt
+}
+
+% Cabecalho e rodape academicos
 \pagestyle{fancy}
 \fancyhf{}
 \renewcommand{\headrulewidth}{0pt}
 \renewcommand{\footrulewidth}{0.4pt}
-\renewcommand{\footrule}{\hbox to\headwidth{\color{bordergray}\leaders\hrule height \footrulewidth\hfill}}
-\fancyfoot[L]{\fontsize{6.8}{8}\selectfont\color{slate500}UNOESC \textbullet{} 33506 Cyber Security — Avaliação A1/3}
-\fancyfoot[R]{\fontsize{6.8}{8}\selectfont\color{slate500}Pedro Diniz; Luiz Felipe Kauê da Silva; Domingos Chicanha Fonseca; Wesley Warken — Página \thepage\ de \pageref{LastPage}}
+\renewcommand{\footrule}{\hbox to\headwidth{\color{codeborder}\leaders\hrule height \footrulewidth\hfill}}
+\fancyfoot[L]{\fontsize{6.6}{7.8}\selectfont\color{slate500}Pedro Diniz; Luiz Felipe Kauê da Silva; Domingos Chicanha Fonseca; Wesley Warken; Gerson Alexandre Damazio}
+\fancyfoot[R]{\fontsize{6.8}{7.8}\selectfont\color{slate700}\textbf{\thepage/\pageref{LastPage}}}
 
-% Configuracao global de paragrafos e listas
-\setlength{\parindent}{0pt}
-\setlength{\parskip}{3pt}
-\setlist[itemize]{leftmargin=12pt,itemsep=1.2pt,topsep=1.5pt,parsep=0pt}
-\renewcommand{\arraystretch}{1.18}
+% Espacamento compacto das secoes preservando a tipografia serifada do modelo UNOESC
+\makeatletter
+\renewcommand\section{\@startsection{section}{1}{\z@}%
+  {-7pt \@plus -2pt \@minus -1pt}%
+  {3.5pt \@plus 1pt}%
+  {\normalfont\fontsize{11}{13}\selectfont\bfseries\color{slate900}}}
+\renewcommand\subsection{\@startsection{subsection}{2}{\z@}%
+  {-5.5pt \@plus -1.5pt \@minus -1pt}%
+  {2.2pt \@plus 0.8pt}%
+  {\normalfont\fontsize{9.4}{11}\selectfont\bfseries\color{unoescblue}}}
+\makeatother
 
-% Helpers tipograficos
-\newcommand{\secbanner}[2]{%
-  \vspace{4pt}%
-  {\noindent\colorbox{navy}{\strut\hspace{2pt}\textcolor{white}{\bfseries\fontsize{7.5}{8.5}\selectfont #1}\hspace{2pt}}\hspace{5pt}%
-  {\fontsize{9.8}{11}\selectfont\bfseries\color{navy}#2}}%
-  \par\vspace{-3.5pt}{\color{blueaccent!25}\rule{\linewidth}{1pt}}\par\vspace{2.5pt}%
-}
-\newcommand{\subsec}[1]{%
-  \vspace{3.5pt}{\noindent\fontsize{8.3}{9.5}\selectfont\bfseries\color{slate900}#1}\par\vspace{1.5pt}%
-}
-\newcommand{\code}[1]{%
-  {\ttfamily\fontsize{7.0}{8.1}\selectfont\color{slate900}#1}%
-}
-\newcommand{\bcode}[1]{%
-  {\ttfamily\fontsize{6.85}{8.0}\selectfont\color{slate900}\seqsplit{#1}}%
-}
-\newcommand{\okbadge}{%
-  \colorbox{okbg}{\textcolor{okfg}{\bfseries\fontsize{6.5}{7.5}\selectfont OK}}%
-}
+\newcommand{\HorRule}[1]{\noindent\rule{\linewidth}{#1}}
+\newcommand{\code}[1]{\leavevmode{\ttfamily\fontsize{7.3}{8.4}\selectfont\color{slate900}#1}}
+\newcommand{\bcode}[1]{\leavevmode{\ttfamily\fontsize{7.1}{8.2}\selectfont\color{slate900}\seqsplit{#1}}}
+\newcommand{\okbadge}{\colorbox{okbg}{\textcolor{okfg}{\bfseries\fontsize{6.6}{7.6}\selectfont OK}}}
+\newcommand{\fonte}[1]{\par\vspace{1.5pt}{\centering\fontsize{7.4}{8.5}\selectfont\color{slate700}Fonte: #1\par}}
+
 \newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
 \newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
 \newcolumntype{Y}{>{\raggedright\arraybackslash}X}
 
-% Listings com quebra automatica de linha e suporte UTF-8
+\setlength{\parskip}{2pt}
+\setlist[itemize]{leftmargin=15pt,itemsep=1.2pt,topsep=1.5pt,parsep=0pt}
+\renewcommand{\arraystretch}{1.15}
+
+% Blocos de codigo e logs com quebra automatica sem corte nas margens
 \lstset{
-  basicstyle=\ttfamily\fontsize{6.5}{7.7}\selectfont,
+  basicstyle=\ttfamily\fontsize{6.7}{7.9}\selectfont\color{slate900},
+  backgroundcolor=\color{codebg},
+  frame=single,
+  rulecolor=\color{codeborder},
+  framerule=0.5pt,
+  framesep=3.5pt,
+  xleftmargin=3pt,
+  xrightmargin=3pt,
+  aboveskip=2pt,
+  belowskip=3pt,
   breaklines=true,
   breakatwhitespace=false,
   postbreak={},
-  escapeinside={(*@}{@*)},
   columns=fullflexible,
   keepspaces=true,
   showstringspaces=false,
-  aboveskip=2.5pt,
-  belowskip=3.5pt,
-  xleftmargin=3pt,
-  xrightmargin=3pt,
-  framesep=3.5pt,
-  framerule=0.5pt,
   literate=
     {á}{{\'a}}1 {à}{{\`a}}1 {â}{{\^a}}1 {ã}{{\~a}}1
     {é}{{\'e}}1 {ê}{{\^e}}1 {í}{{\'i}}1 {ó}{{\'o}}1
@@ -105,263 +116,204 @@
     {Ú}{{\'U}}1 {Ç}{{\c{C}}}1 {→}{{->}}2 {—}{{---}}1
     {–}{{--}}1 {≤}{{<=}}2
 }
-\lstdefinestyle{darkcode}{
-  backgroundcolor=\color{darkcodebg},
-  basicstyle=\ttfamily\fontsize{6.4}{7.6}\selectfont\color{darkcodefg},
-  frame=single,
-  rulecolor=\color{darkcodebg}
-}
-\lstdefinestyle{lightcode}{
-  backgroundcolor=\color{lightcodebg},
-  basicstyle=\ttfamily\fontsize{6.3}{7.4}\selectfont\color{slate900},
-  frame=single,
-  rulecolor=\color{bordergray}
-}
 
-% Caixas tcolorbox reutilizaveis
 \tcbset{
-  cardbox/.style={
-    colback=cardbg,
-    colframe=bordergray,
+  codebox/.style={
+    colback=codebg,
+    colframe=codeborder,
+    colupper=slate900,
     boxrule=0.5pt,
-    arc=2.5pt,
-    left=5pt,right=5pt,top=4pt,bottom=4pt,
-    boxsep=0pt
+    arc=1.5pt,
+    left=5pt,right=5pt,top=3.5pt,bottom=3.5pt,
+    boxsep=0pt,
+    before skip=2pt,
+    after skip=3pt
   },
   infobox/.style={
     colback=infobg,
-    colframe=bordergray,
-    borderline west={2.5pt}{0pt}{infoborder},
+    colframe=codeborder,
+    borderline west={2.2pt}{0pt}{infoborder},
     boxrule=0.4pt,
-    arc=2pt,
-    left=7pt,right=6pt,top=4pt,bottom=4pt,
+    arc=1.5pt,
+    left=6.5pt,right=5.5pt,top=3.5pt,bottom=3.5pt,
     boxsep=0pt
   },
   warnbox/.style={
     colback=warnbg,
     colframe=warnborder!45,
-    borderline west={2.5pt}{0pt}{warnborder},
+    borderline west={2.2pt}{0pt}{warnborder},
     boxrule=0.4pt,
-    arc=2pt,
-    left=7pt,right=6pt,top=4.5pt,bottom=4.5pt,
+    arc=1.5pt,
+    left=6.5pt,right=5.5pt,top=4pt,bottom=4pt,
     boxsep=0pt
-  },
-  darkbox/.style={
-    colback=darkcodebg,
-    colframe=darkcodebg,
-    colupper=darkcodefg,
-    boxrule=0.4pt,
-    arc=2.5pt,
-    left=5.5pt,right=5.5pt,top=4pt,bottom=4pt,
-    boxsep=0pt,
-    before skip=2.5pt,
-    after skip=3.5pt
   }
 }
 
 \begin{document}
 
 % ==============================================================================
-% PÁGINA 1: CABEÇALHO, ARQUITETURA, DIAGRAMA TIKZ E TABELA DE USUÁRIOS
+% PÁGINA 1: CABEÇALHO UNOESC, ARQUITETURA, DIAGRAMA TIKZ E TABELA DE USUÁRIOS
 % ==============================================================================
 \noindent
-\begin{minipage}[b]{0.57\linewidth}
-  {\fontsize{7.2}{8.5}\selectfont\bfseries\color{navy}UNIVERSIDADE DO OESTE DE SANTA CATARINA (UNOESC) — ENGENHARIA DE COMPUTAÇÃO}\par
-  \vspace{2pt}
-  {\fontsize{13}{14.5}\selectfont\bfseries\color{slate900}Autenticação e Autorização — OAuth 2.0 + OpenID Connect}\par
-  \vspace{1.5pt}
-  {\fontsize{7.9}{9.2}\selectfont\color{slate700}Avaliação A1/3 — Disciplina 33506 (Cyber Security) \textbullet{} Opção 1: OpenID Provider Próprio + Aplicação Cliente}
-\end{minipage}\hfill
-\begin{minipage}[b]{0.41\linewidth}
-  \begin{tcolorbox}[colback=cardbg,colframe=bordergray,borderline west={2.5pt}{0pt}{navy},boxrule=0.4pt,arc=2pt,left=6pt,right=5pt,top=3.5pt,bottom=3.5pt,boxsep=0pt]
-    \fontsize{7.2}{9.2}\selectfont
-    \textbf{Professor:} Odemir Moreira da Mata Junior\\
-    \textbf{Acadêmicos:} Pedro Diniz; Luiz Felipe Kauê da Silva; Domingos Chicanha Fonseca; Wesley Warken\\
-    \textbf{Data:} 26/11/2026 \quad|\quad \textbf{Stack:} Python 3.12, Flask, SQLite
-  \end{tcolorbox}
-\end{minipage}
-\vspace{2pt}
-{\color{navy}\rule{\linewidth}{1.6pt}}
+\begin{tabularx}{\linewidth}{@{}L{4.5cm} >{\centering\arraybackslash}X@{}}
+  \raisebox{-0.45\height}{\includegraphics[width=4.3cm]{figuras/computacao.png}} &
+  \textbf{\fontsize{10.5}{12.5}\selectfont UNIVERSIDADE DO OESTE DE SANTA CATARINA}\\
+  & \textbf{\fontsize{9.5}{11.5}\selectfont ÁREA DE CIÊNCIAS EXATAS E TECNOLÓGICAS}\\
+  & {\fontsize{9}{11}\selectfont Curso de Engenharia de Computação}
+\end{tabularx}
 
-\secbanner{1}{Arquitetura e Componentes Implementados}
-{\fontsize{7.9}{9.8}\selectfont
-O sistema implementa a \textbf{Opção 1} em dois processos independentes em Python (Flask + SQLite), com renderização 100\% no servidor — sem JavaScript no back-end e sem exposição de tokens em \code{localStorage} ou scripts do navegador. As credenciais do usuário trafegam exclusivamente entre o navegador e o Servidor de Autorização (OpenID Provider).
-}
-
-\vspace{2pt}
-\noindent
-\begin{minipage}[t]{0.492\linewidth}
-  \begin{tcolorbox}[cardbox,height=32.5mm]
-    {\fontsize{7.8}{9}\selectfont\bfseries\color{navy}Servidor de Autorização — \code{auth\_server/} (OP)}\\[-1pt]
-    {\fontsize{6.9}{8}\selectfont\color{slate500}Portas: \code{:8443} (HTTPS) / \code{:8001} (HTTP local dev)}
-    \begin{itemize}\fontsize{7.15}{8.6}\selectfont
-      \item \code{GET /.well-known/openid-configuration} e \code{GET /jwks.json} (RSA com \code{kid} e rotação).
-      \item \code{GET/POST /authorize}: \code{redirect\_uri} exata, login Argon2id, rate limit, consentimento e \code{code} (TTL $\le$ 60s).
-      \item \code{POST /token}: \code{client\_secret\_post/basic}, PKCE S256, uso único + revogação em replay, RS256 e \code{no-store}.
-      \item \code{GET/POST /userinfo} (Bearer) e \code{POST /logout}.
-    \end{itemize}
-  \end{tcolorbox}
-\end{minipage}\hfill
-\begin{minipage}[t]{0.492\linewidth}
-  \begin{tcolorbox}[cardbox,height=32.5mm]
-    {\fontsize{7.8}{9}\selectfont\bfseries\color{navy}Aplicação Cliente — \code{app/} (Relying Party)}\\[-1pt]
-    {\fontsize{6.9}{8}\selectfont\color{slate500}Portas: \code{:8444} (HTTPS) / \code{:8000} (HTTP local dev)}
-    \begin{itemize}\fontsize{7.15}{8.6}\selectfont
-      \item \code{GET /}: status da sessão, decomposição do ID Token e checklist 10/10.
-      \item \code{GET /login}: gera \code{state}, \code{nonce} e \code{code\_verifier} (256 bits) + \code{code\_challenge} S256.
-      \item \code{GET /callback}: valida \code{state} antes de \code{/token} (sem retry), valida ID Token (\code{RS256}), chama \code{/userinfo} e vincula \code{(iss, sub)}.
-      \item \code{GET /admin} (\code{admin}$\to$200; \code{user}$\to$403) e \code{POST /logout} (CSRF).
-    \end{itemize}
-  \end{tcolorbox}
-\end{minipage}
-
-\secbanner{2}{Diagrama do Fluxo Implementado (Authorization Code + PKCE S256 + OIDC)}
+\vspace{3pt}
+\HorRule{1.0pt}
 \begin{center}
-\vspace{-2pt}
-\begin{tikzpicture}[
-  x=1cm, y=-1cm,
-  >=Stealth,
-  actor/.style={rectangle, rounded corners=3pt, minimum width=3.45cm, minimum height=0.82cm, align=center, text=white, font=\bfseries\fontsize{7.4}{8.5}\selectfont},
-  note/.style={rectangle, rounded corners=2.5pt, draw, align=center, font=\fontsize{6.3}{7.4}\selectfont, inner sep=2.5pt},
-  msg/.style={font=\fontsize{6.4}{7.2}\selectfont, fill=white, inner sep=1pt},
-  arrB/.style={->, thick, color=navy},
-  arrBD/.style={->, thick, dashed, color=navy},
-  arrG/.style={->, thick, color=tealaccent},
-  arrGD/.style={->, thick, dashed, color=tealaccent},
-  arrP/.style={->, thick, color=purpleaccent}
-]
-  % Posicoes horizontais dos 4 atores (largura total ~18.0cm)
-  \def\xU{1.8}
-  \def\xRP{6.6}
-  \def\xOP{11.7}
-  \def\xRS{16.3}
-
-  % Caixas dos atores
-  \node[actor, fill=navy] (U) at (\xU, 0.45) {Usuário / Navegador\\[-1pt]{\normalfont\fontsize{6.1}{7}\selectfont\color{white!85}Resource Owner (sem JWT)}};
-  \node[actor, fill=blueaccent, minimum width=3.8cm] (RP) at (\xRP, 0.45) {Aplicação Cliente (RP)\\[-1pt]{\normalfont\fontsize{6.1}{7}\selectfont\color{white!85}app/ (:8444 HTTPS | :8000 HTTP)}};
-  \node[actor, fill=tealaccent, minimum width=3.9cm] (OP) at (\xOP, 0.45) {Servidor de Autorização\\[-1pt]{\normalfont\fontsize{6.1}{7}\selectfont\color{white!85}auth\_server/ (:8443 | :8001)}};
-  \node[actor, fill=purpleaccent, minimum width=3.1cm] (RS) at (\xRS, 0.45) {Recursos / JWKS\\[-1pt]{\normalfont\fontsize{6.1}{7}\selectfont\color{white!85}/jwks.json e /userinfo}};
-
-  % Linhas de vida
-  \draw[dashed, color=slate500!70, line width=0.6pt] (\xU, 0.88) -- (\xU, 10.65);
-  \draw[dashed, color=slate500!70, line width=0.6pt] (\xRP, 0.88) -- (\xRP, 10.65);
-  \draw[dashed, color=slate500!70, line width=0.6pt] (\xOP, 0.88) -- (\xOP, 10.65);
-  \draw[dashed, color=slate500!70, line width=0.6pt] (\xRS, 0.88) -- (\xRS, 10.65);
-
-  % 1. GET /login
-  \draw[arrB] (\xU, 1.35) -- node[msg, above=1pt] {\textbf{1.} GET /login (``Entrar com OpenID Connect'')} (\xRP, 1.35);
-
-  % 2. Gera state, nonce, PKCE
-  \node[note, fill=blueaccent!8, draw=blueaccent!55, text=navy, minimum width=5.3cm] at (\xRP, 1.92) {
-    \textbf{2.} Gera \texttt{state}, \texttt{nonce}, \texttt{code\_verifier} (256 bits) + cookie \texttt{oidc\_flow}\\
-    \texttt{code\_challenge = BASE64URL(SHA256(code\_verifier))}
-  };
-
-  % 3. 302 -> /authorize
-  \draw[arrBD] (\xRP, 2.55) -- node[msg, above=1pt] {3. 302 $\to$ /authorize (\texttt{response\_type=code}, S256)} (\xU, 2.55);
-
-  % 4. GET /authorize
-  \draw[arrG] (\xU, 3.05) -- node[msg, above=1pt, text=tealaccent] {\textbf{4.} GET /authorize (\texttt{client\_id}, \texttt{redirect\_uri} exata, \texttt{scope openid profile email}, \texttt{state}, \texttt{nonce}, \texttt{challenge})} (\xOP, 3.05);
-
-  % 5. OP valida, login e consentimento
-  \node[note, fill=tealaccent!8, draw=tealaccent!55, text=tealaccent!85!black, minimum width=5.6cm] at (\xOP, 3.72) {
-    \textbf{5.} Valida \texttt{client\_id} e \texttt{redirect\_uri} (HTTP 400 sem redirecionar)\\
-    Login Argon2id + Rate Limit (5/300s) $\to$ Consentimento explícito\\
-    (senha trafega exclusivamente entre Navegador e OP)
-  };
-
-  % 6. 302 -> redirect_uri
-  \draw[arrGD] (\xOP, 4.46) -- node[msg, above=1pt, text=tealaccent] {6. 302 $\to$ \texttt{redirect\_uri?code=<uso único, TTL<=60s>\&state=<idêntico>}} (\xU, 4.46);
-
-  % 7. GET /callback
-  \draw[arrB] (\xU, 4.96) -- node[msg, above=1pt] {\textbf{7.} GET /callback?code=...\&state=... (+ \texttt{oidc\_flow})} (\xRP, 4.96);
-
-  % 8. Valida state
-  \node[note, fill=warnbg, draw=warnborder, text=warnborder!75!black, minimum width=5.1cm] at (\xRP, 5.52) {
-    \textbf{8.} Consome fluxo e valida \texttt{state} (\texttt{hmac.compare\_digest})\\
-    Se divergir ou ausente $\to$ HTTP 400 e aborta antes de \texttt{/token}
-  };
-
-  % 9. Discovery + POST /token
-  \draw[arrG] (\xRP, 6.18) -- node[msg, above=1pt] {\textbf{9.} Discovery + POST /token (back-channel, \texttt{retries=0})} (\xOP, 6.18);
-  \draw[arrGD] (\xOP, 6.68) -- node[msg, above=1pt, text=tealaccent] {Valida \texttt{client\_secret}, \texttt{code}, PKCE $\to$ 200 (\texttt{id\_token} RS256, \texttt{no-store})} (\xRP, 6.68);
-
-  % 10. GET /jwks.json
-  \draw[arrP] (\xRP, 7.18) -- node[msg, above=1pt, text=purpleaccent] {\textbf{10.} GET /jwks.json $\to$ obtém chave pública RSA correspondente ao \texttt{kid}} (\xRS, 7.18);
-
-  % 11. Decompoe + Checklist 1-8
-  \node[note, fill=blueaccent!8, draw=blueaccent!65, text=navy, minimum width=5.4cm] at (\xRP, 7.82) {
-    \textbf{11.} Decompõe ID Token no log + Checklist 4.3 (itens 1--8)\\
-    Lista fixa \texttt{RS256}, assinatura, \texttt{iss}, \texttt{aud}, \texttt{azp}, \texttt{exp}, \texttt{iat}, \texttt{nonce}\\
-    Qualquer falha $\to$ \texttt{OidcAuthenticationError} (HTTP 400)
-  };
-
-  % 12. GET /userinfo
-  \draw[arrP] (\xRP, 8.54) -- node[msg, above=1pt, text=purpleaccent] {\textbf{12.} GET /userinfo (\texttt{Authorization: Bearer <access\_token>}) $\to$ valida \texttt{sub} idêntico (\#10)} (\xRS, 8.54);
-
-  % 13. Vinculo local + sessao
-  \node[note, fill=okbg, draw=okfg!65, text=okfg, minimum width=5.4cm] at (\xRP, 9.18) {
-    \textbf{13.} Vínculo local \texttt{(oidc\_issuer, oidc\_sub)} $\to$ \texttt{id} (\#9)\\
-    Ausente $\to$ HTTP 403 (fail-closed). Presente $\to$ rotaciona\\
-    \texttt{session\_id} (256 bits) em \texttt{sessions} e sincroniza \texttt{role} validado
-  };
-
-  % 14. 302 -> /
-  \draw[arrBD] (\xRP, 9.88) -- node[msg, above=1pt] {14. 302 $\to$ / (\texttt{Set-Cookie: session\_id; HttpOnly})} (\xU, 9.88);
-
-  % 15. GET /admin
-  \draw[arrB] (\xU, 10.38) -- node[msg, above=1pt] {\textbf{15.} GET /admin $\to$ RBAC no servidor (\texttt{admin}=200 | \texttt{user}=403)} (\xRP, 10.38);
-
-  % Moldura externa sutil
-  \draw[rounded corners=4pt, color=bordergray, line width=0.6pt] (-0.1, -0.08) rectangle (18.05, 10.72);
-\end{tikzpicture}
-\vspace{-4pt}
+  \vspace{-4pt}
+  {\fontsize{10.2}{12}\selectfont\bfseries AVALIAÇÃO A1/3 — 33506 CYBER SECURITY}\\
+  {\fontsize{9.2}{11}\selectfont\bfseries AUTENTICAÇÃO E AUTORIZAÇÃO — OAUTH 2.0 + OPENID CONNECT (OPÇÃO 1)}
+  \vspace{-5pt}
 \end{center}
 
-\subsec{Tabela Local de Usuários (Item 4.1 — \code{app/storage.py:16-25})}
-{\fontsize{7.1}{8.5}\selectfont
-\begin{tabularx}{\linewidth}{|L{2.9cm}|L{5.1cm}|Y|}
-  \hline
-  \rowcolor{navy}\textcolor{white}{\bfseries Coluna} & \textcolor{white}{\bfseries Tipo / Restrição} & \textcolor{white}{\bfseries Finalidade no Sistema} \\
-  \hline
-  \code{id} & \code{INTEGER PRIMARY KEY} & Identificador interno na aplicação; gravado em \code{sessions.user\_id}. \\
-  \hline
-  \rowcolor{rowalt}\code{user\_name} & \code{TEXT NOT NULL UNIQUE} & Nome de exibição do usuário (nunca usado como chave de vínculo OIDC). \\
-  \hline
-  \code{full\_name} & \code{TEXT NOT NULL} & Nome completo exibido na interface autenticada. \\
-  \hline
-  \rowcolor{rowalt}\code{oidc\_issuer} + \code{oidc\_sub} & \code{TEXT NOT NULL, UNIQUE (oidc\_issuer, oidc\_sub)} & Chave composta de vínculo com o OpenID Provider (OIDC Core \S5.7). \\
-  \hline
-  \code{role} & \code{TEXT CHECK (role IN ('user','admin'))} & Perfil de autorização revalidado no servidor em cada requisição a \code{/admin}. \\
-  \hline
-  \rowcolor{rowalt}\code{created\_at} & \code{TEXT DEFAULT CURRENT\_TIMESTAMP} & Timestamp de auditoria do registro local. \\
-  \hline
+\noindent
+{\fontsize{8.5}{10.5}\selectfont
+\begin{tabularx}{\linewidth}{@{}L{1.9cm} Y@{}}
+  \textbf{Professor:} & Odemir Moreira da Mata Junior \hfill \textbf{Data:} 26/11/2026 \\
+  \textbf{Alunos:}    & Pedro Diniz; Luiz Felipe Kauê da Silva; Domingos Chicanha Fonseca; Wesley Warken; Gerson Alexandre Damazio
 \end{tabularx}
+}
+\vspace{1pt}
+\HorRule{1.0pt}
+
+\section{Arquitetura e Fluxo Implementado}
+
+O trabalho implementa a \textbf{Opção 1} em dois componentes independentes escritos em Python 3.12 (Flask e SQLite), com renderização integral no servidor — sem JavaScript no back-end e sem exposição de tokens em \code{localStorage}. As credenciais do usuário trafegam exclusivamente entre o navegador e o Servidor de Autorização:
+
+\begin{itemize}\fontsize{8.2}{9.8}\selectfont
+  \item \textbf{Servidor de Autorização (\code{auth\_server/}, OpenID Provider — \code{:8443} HTTPS / \code{:8001} HTTP local):} implementa \code{/.well-known/openid-configuration}, \code{/jwks.json} (RSA-2048 com \code{kid} e rotação), \code{/authorize} (validação exata de \code{redirect\_uri}, login Argon2id, rate limiting, consentimento e emissão de \code{code} com TTL $\le$ 60\,s), \code{/token} (\code{client\_secret\_post/basic}, PKCE S256, uso único com revogação em replay, assinatura RS256 e \code{Cache-Control: no-store}), \code{/userinfo} (Bearer) e \code{/logout}.
+  \item \textbf{Aplicação Cliente (\code{app/}, Relying Party — \code{:8444} HTTPS / \code{:8000} HTTP local):} gera \code{state}, \code{nonce} e \code{code\_verifier} de 256 bits (\code{/login}), valida \code{state} antes de \code{/token} (\code{/callback}, sem retry), decompõe e valida o ID Token em lista fixa \code{RS256} via JWKS, confirma \code{sub} em \code{/userinfo}, vincula por \code{(oidc\_issuer, oidc\_sub)}, rotaciona \code{session\_id} e aplica autorização por \code{role} no servidor (\code{/admin}).
+\end{itemize}
+
+\begin{center}
+  \vspace{-1pt}
+  \captionof{figure}{Fluxo Authorization Code com PKCE (S256) e OpenID Connect implementado}
+  \vspace{1pt}
+  \begin{tikzpicture}[
+    x=1cm, y=-1cm,
+    >=Stealth,
+    actor/.style={rectangle, rounded corners=2.5pt, minimum width=3.35cm, minimum height=0.76cm, align=center, text=white, font=\bfseries\fontsize{7.2}{8.3}\selectfont},
+    note/.style={rectangle, rounded corners=2pt, draw, align=center, font=\fontsize{6.2}{7.3}\selectfont, inner sep=2.2pt},
+    msg/.style={font=\fontsize{6.25}{7.1}\selectfont, fill=white, inner sep=1pt},
+    arrB/.style={->, thick, color=unoescblue},
+    arrBD/.style={->, thick, dashed, color=unoescblue},
+    arrG/.style={->, thick, color=tealaccent},
+    arrGD/.style={->, thick, dashed, color=tealaccent},
+    arrP/.style={->, thick, color=purpleaccent}
+  ]
+    \def\xU{1.75}
+    \def\xRP{6.35}
+    \def\xOP{11.25}
+    \def\xRS{15.65}
+
+    \node[actor, fill=unoescblue] (U) at (\xU, 0.42) {Usuário / Navegador\\[-1pt]{\normalfont\fontsize{6}{6.8}\selectfont\color{white!85}Resource Owner (sem JWT)}};
+    \node[actor, fill=unoescblue!85, minimum width=3.65cm] (RP) at (\xRP, 0.42) {Aplicação Cliente (RP)\\[-1pt]{\normalfont\fontsize{6}{6.8}\selectfont\color{white!85}app/ (:8444 HTTPS | :8000 HTTP)}};
+    \node[actor, fill=tealaccent, minimum width=3.75cm] (OP) at (\xOP, 0.42) {Servidor de Autorização\\[-1pt]{\normalfont\fontsize{6}{6.8}\selectfont\color{white!85}auth\_server/ (:8443 | :8001)}};
+    \node[actor, fill=purpleaccent, minimum width=3.0cm] (RS) at (\xRS, 0.42) {Recursos / JWKS\\[-1pt]{\normalfont\fontsize{6}{6.8}\selectfont\color{white!85}/jwks.json e /userinfo}};
+
+    \draw[dashed, color=slate500!70, line width=0.55pt] (\xU, 0.82) -- (\xU, 9.75);
+    \draw[dashed, color=slate500!70, line width=0.55pt] (\xRP, 0.82) -- (\xRP, 9.75);
+    \draw[dashed, color=slate500!70, line width=0.55pt] (\xOP, 0.82) -- (\xOP, 9.75);
+    \draw[dashed, color=slate500!70, line width=0.55pt] (\xRS, 0.82) -- (\xRS, 9.75);
+
+    \draw[arrB] (\xU, 1.24) -- node[msg, above=0.8pt] {\textbf{1.} GET /login (``Entrar com OpenID Connect'')} (\xRP, 1.24);
+
+    \node[note, fill=unoescblue!6, draw=unoescblue!50, text=unoescblue, minimum width=5.1cm] at (\xRP, 1.76) {
+      \textbf{2.} Gera \texttt{state}, \texttt{nonce}, \texttt{code\_verifier} (256 bits) + cookie \texttt{oidc\_flow}\\
+      \texttt{code\_challenge = BASE64URL(SHA256(code\_verifier))}
+    };
+
+    \draw[arrBD] (\xRP, 2.34) -- node[msg, above=0.8pt] {3. 302 $\to$ /authorize (\texttt{response\_type=code}, S256)} (\xU, 2.34);
+
+    \draw[arrG] (\xU, 2.80) -- node[msg, above=0.8pt, text=tealaccent] {\textbf{4.} GET /authorize (\texttt{client\_id}, \texttt{redirect\_uri} exata, \texttt{scope openid profile email}, \texttt{state}, \texttt{nonce}, \texttt{challenge})} (\xOP, 2.80);
+
+    \node[note, fill=tealaccent!7, draw=tealaccent!55, text=tealaccent!85!black, minimum width=5.4cm] at (\xOP, 3.42) {
+      \textbf{5.} Valida \texttt{client\_id} e \texttt{redirect\_uri} (HTTP 400 sem redirecionar)\\
+      Login Argon2id + Rate Limit (5/300s) $\to$ Consentimento explícito\\
+      (senha trafega exclusivamente entre Navegador e OP)
+    };
+
+    \draw[arrGD] (\xOP, 4.10) -- node[msg, above=0.8pt, text=tealaccent] {6. 302 $\to$ \texttt{redirect\_uri?code=<uso único, TTL<=60s>\&state=<idêntico>}} (\xU, 4.10);
+
+    \draw[arrB] (\xU, 4.55) -- node[msg, above=0.8pt] {\textbf{7.} GET /callback?code=...\&state=... (+ \texttt{oidc\_flow})} (\xRP, 4.55);
+
+    \node[note, fill=warnbg, draw=warnborder, text=warnborder!75!black, minimum width=4.95cm] at (\xRP, 5.06) {
+      \textbf{8.} Consome fluxo e valida \texttt{state} (\texttt{hmac.compare\_digest})\\
+      Se divergir ou ausente $\to$ HTTP 400 e aborta antes de \texttt{/token}
+    };
+
+    \draw[arrG] (\xRP, 5.66) -- node[msg, above=0.8pt] {\textbf{9.} Discovery + POST /token (back-channel, \texttt{retries=0})} (\xOP, 5.66);
+    \draw[arrGD] (\xOP, 6.12) -- node[msg, above=0.8pt, text=tealaccent] {Valida \texttt{client\_secret}, \texttt{code}, PKCE $\to$ 200 (\texttt{id\_token} RS256, \texttt{no-store})} (\xRP, 6.12);
+
+    \draw[arrP] (\xRP, 6.58) -- node[msg, above=0.8pt, text=purpleaccent] {\textbf{10.} GET /jwks.json $\to$ obtém chave pública RSA correspondente ao \texttt{kid}} (\xRS, 6.58);
+
+    \node[note, fill=unoescblue!6, draw=unoescblue!55, text=unoescblue, minimum width=5.2cm] at (\xRP, 7.18) {
+      \textbf{11.} Decompõe ID Token no log + Checklist 4.3 (itens 1--8)\\
+      Lista fixa \texttt{RS256}, assinatura, \texttt{iss}, \texttt{aud}, \texttt{azp}, \texttt{exp}, \texttt{iat}, \texttt{nonce}\\
+      Qualquer falha $\to$ \texttt{OidcAuthenticationError} (HTTP 400)
+    };
+
+    \draw[arrP] (\xRP, 7.84) -- node[msg, above=0.8pt, text=purpleaccent] {\textbf{12.} GET /userinfo (\texttt{Bearer <access\_token>}) $\to$ valida \texttt{sub} idêntico (\#10)} (\xRS, 7.84);
+
+    \node[note, fill=okbg, draw=okfg!65, text=okfg, minimum width=5.2cm] at (\xRP, 8.43) {
+      \textbf{13.} Vínculo local \texttt{(oidc\_issuer, oidc\_sub)} $\to$ \texttt{id} (\#9)\\
+      Ausente $\to$ HTTP 403 (fail-closed). Presente $\to$ rotaciona\\
+      \texttt{session\_id} (256 bits) em \texttt{sessions} e sincroniza \texttt{role} validado
+    };
+
+    \draw[arrBD] (\xRP, 9.06) -- node[msg, above=0.8pt] {14. 302 $\to$ / (\texttt{Set-Cookie: session\_id; HttpOnly})} (\xU, 9.06);
+    \draw[arrB] (\xU, 9.50) -- node[msg, above=0.8pt] {\textbf{15.} GET /admin $\to$ RBAC no servidor (\texttt{admin}=200 | \texttt{user}=403)} (\xRP, 9.50);
+
+    \draw[rounded corners=3pt, color=codeborder, line width=0.55pt] (-0.05, -0.06) rectangle (17.32, 9.82);
+  \end{tikzpicture}
+  \fonte{Elaboração dos autores.}
+\end{center}
+
+\vspace{-2pt}
+\captionof{table}{Esquema da tabela local \texttt{users} (Item 4.1 — \texttt{app/storage.py:16-25})}
+{\fontsize{7.4}{8.8}\selectfont
+\begin{tabularx}{\linewidth}{@{}L{2.85cm} L{5.1cm} Y@{}}
+  \toprule
+  \textbf{Coluna} & \textbf{Tipo / Restrição} & \textbf{Finalidade no Sistema} \\
+  \midrule
+  \code{id} & \code{INTEGER PRIMARY KEY} & Identificador interno na aplicação; gravado em \code{sessions.user\_id}. \\
+  \code{user\_name} & \code{TEXT NOT NULL UNIQUE} & Nome de exibição do usuário (nunca usado como chave de vínculo OIDC). \\
+  \code{full\_name} & \code{TEXT NOT NULL} & Nome completo exibido na interface autenticada. \\
+  \code{oidc\_issuer} + \code{oidc\_sub} & \code{TEXT NOT NULL, UNIQUE (oidc\_issuer, oidc\_sub)} & Chave composta de vínculo com o OpenID Provider (OIDC Core \S5.7). \\
+  \code{role} & \code{TEXT CHECK (role IN ('user','admin'))} & Perfil de autorização revalidado no servidor a cada acesso em \code{/admin}. \\
+  \code{created\_at} & \code{TEXT DEFAULT CURRENT\_TIMESTAMP} & Data/hora de auditoria do registro local. \\
+  \bottomrule
+\end{tabularx}
+\fonte{Elaboração dos autores.}
 }
 
 \newpage
 % ==============================================================================
 % PÁGINA 2: ID TOKEN REAL DECODIFICADO E LOGS DE EXECUÇÃO
 % ==============================================================================
-\secbanner{3}{ID Token Real Decodificado (Execução Real — 26/11/2026)}
-{\fontsize{8}{10}\selectfont
-As três partes do JWS compacto abaixo foram capturadas diretamente da execução real dos dois servidores Flask (\code{auth\_server} em \code{http://localhost:8001} e \code{app} em \code{http://localhost:8000}, com login do usuário \code{admin} às 19:00:24 em 26/11/2026). Nenhum dado foi fabricado; credenciais, senhas, \code{client\_secret} e chaves privadas não constam neste documento.
-}
+\section{ID Token Real Decodificado e Evidências de Execução}
+
+As três partes do JWS compacto abaixo foram capturadas diretamente da execução real dos dois servidores Flask (\code{auth\_server} em \code{http://localhost:8001} e \code{app} em \code{http://localhost:8000}), durante o login do usuário \code{admin} em 26/11/2026 às 19:00:24. Nenhuma saída foi simulada; senhas, \code{client\_secret} e chaves privadas não constam neste documento.
 
 \vspace{2pt}
 \noindent
-\begin{minipage}[t]{0.44\linewidth}
-  \subsec{3.1 Cabeçalho (Header — Base64URL decodificado)}
-\begin{lstlisting}[style=darkcode]
+\begin{minipage}[t]{0.445\linewidth}
+  \subsection{Cabeçalho (Header — Base64URL decodificado)}
+\begin{lstlisting}
 {
   "alg": "RS256",
   "kid": "rsa-2026-11-bedae646",
   "typ": "JWT"
 }
 \end{lstlisting}
-  \subsec{3.2 Chave Pública Correspondente (\code{GET /jwks.json})}
-  \begin{tcolorbox}[darkbox]
-    \ttfamily\fontsize{6.3}{7.5}\selectfont\raggedright
+  \subsection{Chave Pública (\texttt{GET /jwks.json})}
+  \begin{tcolorbox}[codebox]
+    \ttfamily\fontsize{6.5}{7.7}\selectfont\raggedright
     \{\\
     \hspace*{0.8em}"keys": [\\
     \hspace*{1.6em}\{\\
@@ -376,9 +328,9 @@ As três partes do JWS compacto abaixo foram capturadas diretamente da execuçã
     \}
   \end{tcolorbox}
 \end{minipage}\hfill
-\begin{minipage}[t]{0.535\linewidth}
-  \subsec{3.3 Payload (Claims Validados — Base64URL decodificado)}
-\begin{lstlisting}[style=darkcode]
+\begin{minipage}[t]{0.53\linewidth}
+  \subsection{Payload (Claims Validados — Base64URL decodificado)}
+\begin{lstlisting}
 {
   "iss": "http://localhost:8001",
   "sub": "1000000001",
@@ -393,10 +345,10 @@ As três partes do JWS compacto abaixo foram capturadas diretamente da execuçã
   "role": "admin"
 }
 \end{lstlisting}
-  {\fontsize{7.2}{8.8}\selectfont\color{slate700}
-  Observe \code{exp - iat = 1795731322 - 1795730422 = 900 s} (15 minutos), \code{iss} idêntico ao \code{issuer} da descoberta e todos os 11 claims exigidos na Seção 2.5 presentes.\par}
-  \subsec{3.4 Resposta Real de \code{GET /userinfo} (Bearer Access Token)}
-\begin{lstlisting}[style=darkcode]
+  {\fontsize{7.5}{9.1}\selectfont\color{slate700}
+  Nota-se \code{exp - iat = 1795731322 - 1795730422 = 900\,s} (15 minutos), \code{iss} idêntico ao \code{issuer} da descoberta e todos os 11 claims obrigatórios da Seção 2.5 presentes.\par}
+  \subsection{Resposta Real de \texttt{GET /userinfo} (Bearer Token)}
+\begin{lstlisting}
 {
   "sub": "1000000001",
   "name": "Administrador (Demo)",
@@ -406,9 +358,9 @@ As três partes do JWS compacto abaixo foram capturadas diretamente da execuçã
 \end{lstlisting}
 \end{minipage}
 
-\subsec{3.5 Assinatura Digital (Signature — RS256 / RSA-2048, 256 bytes)}
-\begin{tcolorbox}[darkbox]
-  \ttfamily\fontsize{6.4}{7.7}\selectfont\raggedright
+\subsection{Assinatura Digital (Signature — RS256 / RSA-2048, 256 bytes)}
+\begin{tcolorbox}[codebox]
+  \ttfamily\fontsize{6.6}{7.8}\selectfont\raggedright
   Algoritmo: RSASSA-PKCS1-v1\_5 com SHA-256 (RS256) | Tamanho decodificado: 256 bytes (2048 bits)\\
   Entrada assinada: BASE64URL(header) + "." + BASE64URL(payload) | Chave de verificação: kid="rsa-2026-11-bedae646"\\[3pt]
   Base64URL (342 caracteres):\\
@@ -417,11 +369,10 @@ As três partes do JWS compacto abaixo foram capturadas diretamente da execuçã
   \seqsplit{991e21c0b8fc52f986aafef252758fe55c7e966e0e908c065c790dc869c95c4d...}
 \end{tcolorbox}
 
-\subsec{3.6 Evidência de Execução Real nos Logs dos Servidores (Item 4.2.7 + Mascaramento de URLs)}
-{\fontsize{7.8}{9.5}\selectfont
-Durante a execução ponta a ponta, a Aplicação Cliente registra a decomposição do ID Token no log do servidor em nível \code{INFO} (\code{app/oidc.py:251-257}) e ambos os servidores mascaram query strings sensíveis (\code{/authorize?[REDACTED]} e \code{/callback?[REDACTED]}) para evitar vazamento de \code{code} e \code{state}:
-}
-\begin{lstlisting}[style=lightcode]
+\subsection{Evidência nos Logs Reais dos Servidores (Item 4.2.7 e Mascaramento de URLs)}
+Durante a execução ponta a ponta, a Aplicação Cliente registra a decomposição do ID Token em nível \code{INFO} (\code{app/oidc.py:251-257}) e ambos os componentes mascaram query strings sensíveis (\code{/authorize?[REDACTED]} e \code{/callback?[REDACTED]}):
+
+\begin{lstlisting}
 # Log real do Servidor de Autorizacao (auth_server, porta 8001)
 127.0.0.1 - - [26/Nov/2026 19:00:11] "GET /authorize?[REDACTED] HTTP/1.1" 200 -
 127.0.0.1 - - [26/Nov/2026 19:00:13] "POST /authorize HTTP/1.1" 200 -
@@ -444,140 +395,129 @@ Durante a execução ponta a ponta, a Aplicação Cliente registra a decomposiç
 \end{lstlisting}
 
 \begin{tcolorbox}[infobox]
-  {\fontsize{7.5}{9.3}\selectfont
-  \textbf{Cookie de sessão emitido no callback (execução real):} \code{session\_id=<43 chars / 256 bits aleatórios>; Max-Age=28800; HttpOnly; Path=/; SameSite=Lax} (acrescido de \code{Secure} quando servido em HTTPS, via \code{"secure": request.is\_secure} em \code{app/routes.py:16}), simultâneo ao descarte imediato do cookie temporário \code{oidc\_flow} (\code{Max-Age=0}).}
+  {\fontsize{7.7}{9.5}\selectfont
+  \textbf{Cookie de sessão emitido no callback (execução real):} \code{session\_id=<43 chars / 256 bits aleatórios>; Max-Age=28800; HttpOnly; Path=/; SameSite=Lax} (com \code{Secure} quando servido em HTTPS, via \code{"secure": request.is\_secure} em \code{app/routes.py:16}), acompanhado do descarte imediato do cookie temporário \code{oidc\_flow} (\code{Max-Age=0}).}
 \end{tcolorbox}
 
 \newpage
 % ==============================================================================
 % PÁGINA 3: CHECKLIST DO ITEM 4.3 (10/10 COM ARQUIVO:LINHA E EVIDÊNCIA REAL)
 % ==============================================================================
-\secbanner{4}{Checklist de Validação do ID Token (Item 4.3 — 10/10 Concluídos)}
-{\fontsize{8}{9.8}\selectfont
-Cada verificação exigida no item 4.3 do enunciado é executada no back-end da Aplicação Cliente antes da criação da sessão local. A tabela abaixo mapeia a referência normativa, a implementação exata (\code{arquivo:linha}) e a evidência real obtida no fluxo ao vivo e na suíte automatizada.
-}
+\section{Checklist de Validação do ID Token (Item 4.3)}
+
+Todas as dez verificações exigidas no item 4.3 do enunciado são executadas no servidor da Aplicação Cliente antes da criação da sessão local. A Tabela~\ref{tab:checklist} relaciona referência normativa, localização exata no código (\code{arquivo:linha}) e evidência real de execução e testes.
 
 \vspace{2pt}
-{\fontsize{7.15}{8.6}\selectfont
-\renewcommand{\arraystretch}{1.24}
-\begin{tabularx}{\linewidth}{|C{0.5cm}|L{4.5cm}|L{3.1cm}|C{0.9cm}|Y|}
-  \hline
-  \rowcolor{navy}\textcolor{white}{\bfseries \#} & \textcolor{white}{\bfseries Verificação e Referência} & \textcolor{white}{\bfseries Implementação (\texttt{arquivo:linha})} & \textcolor{white}{\bfseries Status} & \textcolor{white}{\bfseries Evidência Real (Fluxo ao Vivo e Testes)} \\
-  \hline
-  \textbf{1} & Assinatura conferida com chave pública do emissor por \code{kid}; chave não encontrada deve ser erro.\newline{\color{slate500}\fontsize{6.6}{7.6}\selectfont OIDC Core \S3.1.3.7 (6-7); RFC 8725 \S3.1} & \code{app/oidc.py:221-231}\newline\code{app/oidc.py:267-296} & \okbadge & Fluxo real: \bcode{kid=rsa-2026-11-bedae646} localizado em \code{/jwks.json} e verificado via RSA-2048.\newline Negativo: \bcode{test\_neg\_12} (\code{Signature verification failed}) e \bcode{test\_kid\_desconhecido...} (\code{Chave publica nao encontrada no JWKS}). \\
-  \hline
-  \rowcolor{rowalt}\textbf{2} & Algoritmo na lista fixa aceita; \code{alg="none"} é sempre rejeitado.\newline{\color{slate500}\fontsize{6.6}{7.6}\selectfont RFC 8725 \S2.1, \S3.1} & \code{app/oidc.py:20}\newline\code{app/oidc.py:262-264}\newline\code{app/oidc.py:284} & \okbadge & Constante fixa \bcode{ALLOWED\_ID\_TOKEN\_ALGORITHMS = ("RS256",)}. Fluxo real: \code{alg=RS256}.\newline Negativos: \bcode{test\_neg\_01} (\code{Algoritmo de ID Token rejeitado: 'none'.}) e \bcode{test\_neg\_02} (\code{rejeitado: 'HS256'.}). \\
-  \hline
-  \textbf{3} & \code{iss} idêntico ao \code{issuer} publicado na descoberta.\newline{\color{slate500}\fontsize{6.6}{7.6}\selectfont OIDC Core \S3.1.3.7 (2)} & \code{app/oidc.py:181-182}\newline\code{app/oidc.py:316-318} & \okbadge & Comparação \bcode{hmac.compare\_digest(iss, expected\_issuer)}. Fluxo real: \code{iss = "http://localhost:8001"}.\newline Negativo: \bcode{test\_neg\_04} (\code{Claim iss do ID Token diverge do emissor esperado.}). \\
-  \hline
-  \rowcolor{rowalt}\textbf{4} & \code{aud} contém o \code{client\_id} da aplicação.\newline{\color{slate500}\fontsize{6.6}{7.6}\selectfont OIDC Core \S3.1.3.7 (3)} & \code{app/oidc.py:329-338} & \okbadge & Aceita string ou lista de strings; exige \bcode{expected\_client\_id} em \code{aud\_list}. Fluxo real: \bcode{aud = "app-cybersecurity-33506"}.\newline Negativo: \bcode{test\_neg\_03} (\code{Claim aud do ID Token nao contem o client\_id da aplicacao.}). \\
-  \hline
-  \textbf{5} & Se \code{aud} tiver mais de um valor, \code{azp} é validado.\newline{\color{slate500}\fontsize{6.6}{7.6}\selectfont OIDC Core \S3.1.3.7 (4-5)} & \code{app/oidc.py:349-355} & \okbadge & Exige \code{azp == client\_id} quando \code{len(aud\_list) > 1} ou quando \code{azp} está presente. Fluxo real: \bcode{azp = "app-cybersecurity-33506"}.\newline Teste: \bcode{test\_azp\_com\_multiplos\_aud\_e\_mascara\_log\_callback} (\code{PASSED}). \\
-  \hline
-  \rowcolor{rowalt}\textbf{6} & \code{exp} está no futuro, com tolerância máxima de poucos minutos.\newline{\color{slate500}\fontsize{6.6}{7.6}\selectfont OIDC Core \S3.1.3.7 (9)} & \code{app/oidc.py:368-372}\newline\code{app/config.py:27} & \okbadge & Rejeita se \code{exp < now - 60} (skew máximo de 60s). Fluxo real: \code{exp=1795731322} (900s à frente).\newline Negativo: \bcode{test\_neg\_05} (\code{ID Token expirado (claim exp vencido).}). \\
-  \hline
-  \textbf{7} & \code{iat} não está no futuro.\newline{\color{slate500}\fontsize{6.6}{7.6}\selectfont OIDC Core \S3.1.3.7 (10)} & \code{app/oidc.py:383-387} & \okbadge & Rejeita se \code{iat > now + 60}. Fluxo real: \code{iat=1795730422}.\newline Negativo: \bcode{test\_neg\_06} (\code{Claim iat do ID Token esta no futuro.}). \\
-  \hline
-  \rowcolor{rowalt}\textbf{8} & \code{nonce} idêntico ao enviado na requisição.\newline{\color{slate500}\fontsize{6.6}{7.6}\selectfont OIDC Core \S3.1.3.7 (11)} & \code{app/oidc.py:398-400} & \okbadge & Comparação \bcode{hmac.compare\_digest(nonce, expected\_nonce)}. Fluxo real: \bcode{nonce=Vc-DJRfUhUYA0Rq-INGmSHFuH0vJtVK6m7i8llxO\_EA}.\newline Negativo: \bcode{test\_neg\_07} (\code{Claim nonce do ID Token diverge do valor enviado.}). \\
-  \hline
-  \textbf{9} & \code{sub} localizado na tabela e convertido no \code{id} interno.\newline{\color{slate500}\fontsize{6.6}{7.6}\selectfont OIDC Core \S5.7} & \code{app/storage.py:117-122}\newline\code{app/routes.py:121-139} & \okbadge & Consulta \code{WHERE oidc\_issuer = ? AND oidc\_sub = ?}. Fluxo real: \code{sub="1000000001"} $\to$ \code{id=1} (admin); \code{sub="1000000002"} $\to$ \code{id=2} (user).\newline Ausente $\to$ HTTP 403 (\bcode{test\_kid\_desconhecido\_sub\_nao\_cadastrado...}). \\
-  \hline
-  \rowcolor{rowalt}\textbf{10} & Se \code{/userinfo} for usado, o \code{sub} devolvido é igual ao do ID Token.\newline{\color{slate500}\fontsize{6.6}{7.6}\selectfont OIDC Core \S5.3.2} & \code{app/oidc.py:417-445}\newline\code{app/oidc.py:515-525} & \okbadge & Chamada obrigatória com \code{Authorization: Bearer <access\_token>}. Fluxo real: \code{userinfo["sub"] == "1000000001" == id\_token["sub"]}.\newline Divergente $\to$ rejeitado em \bcode{test\_kid\_desconhecido\_sub\_nao\_cadastrado...}. \\
-  \hline
+\captionof{table}{Checklist de validação do ID Token (Item 4.3 — 10/10 concluídos)}\label{tab:checklist}
+{\fontsize{7.2}{8.65}\selectfont
+\renewcommand{\arraystretch}{1.22}
+\begin{tabularx}{\linewidth}{@{}C{0.45cm} L{4.2cm} L{3.15cm} C{0.8cm} Y@{}}
+  \toprule
+  \textbf{\#} & \textbf{Verificação e Referência} & \textbf{Implementação (\texttt{arq:linha})} & \textbf{Status} & \textbf{Evidência Real (Fluxo ao Vivo e Testes)} \\
+  \midrule
+  \textbf{1} & Assinatura conferida com chave pública do emissor por \code{kid}; chave não encontrada é erro.\newline{\color{slate500}\fontsize{6.6}{7.5}\selectfont OIDC Core \S3.1.3.7 (6-7); RFC 8725 \S3.1} & \code{app/oidc.py:221-231}\newline\code{app/oidc.py:267-296} & \okbadge & Fluxo real: \bcode{kid=rsa-2026-11-bedae646} localizado em \code{/jwks.json} e verificado via RSA-2048.\newline Testes: \bcode{test\_neg\_12} (\code{Signature verification failed}) e \bcode{test\_kid\_desconhecido...} (\code{Chave publica nao encontrada no JWKS}). \\
+  \midrule
+  \textbf{2} & Algoritmo na lista fixa aceita; \code{alg="none"} sempre rejeitado.\newline{\color{slate500}\fontsize{6.6}{7.5}\selectfont RFC 8725 \S2.1, \S3.1} & \code{app/oidc.py:20}\newline\code{app/oidc.py:262-264}\newline\code{app/oidc.py:284} & \okbadge & Constante fixa \bcode{ALLOWED\_ID\_TOKEN\_ALGORITHMS = ("RS256",)}. Fluxo real: \code{alg=RS256}.\newline Testes: \bcode{test\_neg\_01} (\code{Algoritmo de ID Token rejeitado: 'none'.}) e \bcode{test\_neg\_02} (\code{rejeitado: 'HS256'.}). \\
+  \midrule
+  \textbf{3} & \code{iss} idêntico ao \code{issuer} publicado na descoberta.\newline{\color{slate500}\fontsize{6.6}{7.5}\selectfont OIDC Core \S3.1.3.7 (2)} & \code{app/oidc.py:181-182}\newline\code{app/oidc.py:316-318} & \okbadge & Comparação \bcode{hmac.compare\_digest(iss, expected\_issuer)}. Fluxo real: \code{iss = "http://localhost:8001"}.\newline Teste: \bcode{test\_neg\_04} (\code{Claim iss do ID Token diverge do emissor esperado.}). \\
+  \midrule
+  \textbf{4} & \code{aud} contém o \code{client\_id} da aplicação.\newline{\color{slate500}\fontsize{6.6}{7.5}\selectfont OIDC Core \S3.1.3.7 (3)} & \code{app/oidc.py:329-338} & \okbadge & Aceita string ou lista de strings; exige \bcode{expected\_client\_id} em \code{aud\_list}. Fluxo real: \bcode{aud = "app-cybersecurity-33506"}.\newline Teste: \bcode{test\_neg\_03} (\code{Claim aud do ID Token nao contem o client\_id da aplicacao.}). \\
+  \midrule
+  \textbf{5} & Se \code{aud} tiver mais de um valor, \code{azp} é validado.\newline{\color{slate500}\fontsize{6.6}{7.5}\selectfont OIDC Core \S3.1.3.7 (4-5)} & \code{app/oidc.py:349-355} & \okbadge & Exige \code{azp == client\_id} quando \code{len(aud\_list) > 1} ou quando \code{azp} está presente. Fluxo real: \bcode{azp = "app-cybersecurity-33506"}.\newline Teste: \bcode{test\_azp\_com\_multiplos\_aud\_e\_mascara\_log\_callback} (\code{PASSED}). \\
+  \midrule
+  \textbf{6} & \code{exp} no futuro, com tolerância máxima de poucos minutos.\newline{\color{slate500}\fontsize{6.6}{7.5}\selectfont OIDC Core \S3.1.3.7 (9)} & \code{app/oidc.py:368-372}\newline\code{app/config.py:27} & \okbadge & Rejeita se \code{exp < now - 60} (skew máximo de 60\,s). Fluxo real: \code{exp=1795731322} (900\,s à frente).\newline Teste: \bcode{test\_neg\_05} (\code{ID Token expirado (claim exp vencido).}). \\
+  \midrule
+  \textbf{7} & \code{iat} não está no futuro.\newline{\color{slate500}\fontsize{6.6}{7.5}\selectfont OIDC Core \S3.1.3.7 (10)} & \code{app/oidc.py:383-387} & \okbadge & Rejeita se \code{iat > now + 60}. Fluxo real: \code{iat=1795730422}.\newline Teste: \bcode{test\_neg\_06} (\code{Claim iat do ID Token esta no futuro.}). \\
+  \midrule
+  \textbf{8} & \code{nonce} idêntico ao enviado na requisição.\newline{\color{slate500}\fontsize{6.6}{7.5}\selectfont OIDC Core \S3.1.3.7 (11)} & \code{app/oidc.py:398-400} & \okbadge & Comparação \bcode{hmac.compare\_digest(nonce, expected\_nonce)}. Fluxo real: \bcode{nonce=Vc-DJRfUhUYA0Rq-INGmSHFuH0vJtVK6m7i8llxO\_EA}.\newline Teste: \bcode{test\_neg\_07} (\code{Claim nonce do ID Token diverge do valor enviado.}). \\
+  \midrule
+  \textbf{9} & \code{sub} localizado na tabela e convertido no \code{id} interno.\newline{\color{slate500}\fontsize{6.6}{7.5}\selectfont OIDC Core \S5.7} & \code{app/storage.py:117-122}\newline\code{app/routes.py:121-139} & \okbadge & Consulta \code{WHERE oidc\_issuer = ? AND oidc\_sub = ?}. Fluxo real: \code{sub="1000000001"} $\to$ \code{id=1}; \code{sub="1000000002"} $\to$ \code{id=2}.\newline Ausente $\to$ HTTP 403 (\bcode{test\_kid\_desconhecido\_sub\_nao\_cadastrado...}). \\
+  \midrule
+  \textbf{10} & Se \code{/userinfo} for usado, \code{sub} devolvido é igual ao do ID Token.\newline{\color{slate500}\fontsize{6.6}{7.5}\selectfont OIDC Core \S5.3.2} & \code{app/oidc.py:417-445}\newline\code{app/oidc.py:515-525} & \okbadge & Chamada obrigatória com \code{Authorization: Bearer <access\_token>}. Fluxo real: \code{userinfo["sub"] == "1000000001" == id\_token["sub"]}.\newline Divergente $\to$ rejeitado em \bcode{test\_kid\_desconhecido\_sub\_nao\_cadastrado...}. \\
+  \bottomrule
 \end{tabularx}
+\fonte{Elaboração dos autores.}
 }
 
-\vspace{5pt}
-\subsec{Verificações Complementares de Protocolo (Seções 2 e 4)}
-\noindent
-\begin{minipage}[t]{0.49\linewidth}
-  \begin{tcolorbox}[cardbox]
-    {\fontsize{7.7}{9}\selectfont\bfseries\color{navy}Descoberta, JWKS e Rotação de Chaves}\par\vspace{1.5pt}
-    {\fontsize{7.3}{9}\selectfont\color{slate700}
-    \bcode{test\_discovery\_jwks\_e\_rotacao\_de\_chave\_rsa} comprova que \bcode{/.well-known/openid-configuration} expõe todos os metadados do item 2.1 e que \bcode{KeyManager.rotate\_key()} (\code{auth\_server/keys.py:66-76}) adiciona nova chave ativa mantendo o \code{kid} anterior em \code{/jwks.json}, validando simultaneamente tokens antigos e novos durante a janela de transição.}
-  \end{tcolorbox}
-\end{minipage}\hfill
-\begin{minipage}[t]{0.49\linewidth}
-  \begin{tcolorbox}[cardbox]
-    {\fontsize{7.7}{9}\selectfont\bfseries\color{navy}Sessão Local, Rotação e Erros no Callback}\par\vspace{1.5pt}
-    {\fontsize{7.3}{9}\selectfont\color{slate700}
-    \bcode{test\_implicit\_proibido\_callback\_access\_denied\_e\_rotacao\_sessao} comprova rejeição de \code{response\_type=token} (HTTP 400 sem redirecionar), tratamento amigável de \code{error=access\_denied} no callback (HTTP 400 sem criar sessão, item 4.6) e rotação obrigatória do \code{session\_id} no login invalidando o identificador anterior (item 4.4).}
-  \end{tcolorbox}
-\end{minipage}
+\subsection{Verificações Complementares de Protocolo (Seções 2 e 4)}
+\begin{itemize}\fontsize{7.8}{9.5}\selectfont
+  \item \textbf{Descoberta, JWKS e rotação de chaves:} \bcode{test\_discovery\_jwks\_e\_rotacao\_de\_chave\_rsa} comprova que \bcode{/.well-known/openid-configuration} expõe todos os metadados do item 2.1 e que \bcode{KeyManager.rotate\_key()} (\code{auth\_server/keys.py:66-76}) ativa um novo par RSA mantendo o \code{kid} anterior publicado em \code{/jwks.json}, validando simultaneamente tokens antigos e novos durante a transição.
+  \item \textbf{Sessão local, rotação e tratamento de erros no callback:} \bcode{test\_implicit\_proibido\_callback\_access\_denied\_e\_rotacao\_sessao} comprova a rejeição de \code{response\_type=token} (HTTP 400 sem redirecionar), o tratamento amigável de \code{error=access\_denied} no callback (HTTP 400 sem criar sessão, item 4.6) e a rotação obrigatória do \code{session\_id} no login invalidando o identificador anterior (item 4.4).
+\end{itemize}
 
 \newpage
 % ==============================================================================
 % PÁGINA 4: TESTES NEGATIVOS OBRIGATÓRIOS — CASOS 1 A 9
 % ==============================================================================
-\secbanner{5}{Testes Negativos Obrigatórios (Item 5 — Casos 1 a 9)}
-{\fontsize{8}{9.8}\selectfont
-Todos os 15 cenários negativos obrigatórios da Seção 5 estão automatizados em \code{tests/test\_security\_suite.py} e foram executados sobre a implementação real. As colunas abaixo apresentam o resultado esperado, o teste correspondente e a saída real capturada na execução.
-}
+\section{Testes Negativos Obrigatórios (Item 5)}
+
+Todos os 15 cenários negativos obrigatórios da Seção 5 estão automatizados em \code{tests/test\_security\_suite.py} e foram executados sobre a implementação real. As Tabelas~\ref{tab:neg1} e~\ref{tab:neg2} reúnem o resultado esperado, o caso de teste correspondente e a evidência real capturada em terminal (exceção levantada, resposta HTTP, cabeçalhos e registros de log).
 
 \vspace{2pt}
-{\fontsize{7.15}{8.6}\selectfont
-\renewcommand{\arraystretch}{1.28}
-\begin{tabularx}{\linewidth}{|C{0.5cm}|L{3.9cm}|L{2.3cm}|L{3.9cm}|Y|}
-  \hline
-  \rowcolor{navy}\textcolor{white}{\bfseries \#} & \textcolor{white}{\bfseries Cenário de Ataque ou Falha} & \textcolor{white}{\bfseries Esperado} & \textcolor{white}{\bfseries Teste / Mecanismo} & \textcolor{white}{\bfseries Evidência Real de Execução (Exceção / HTTP / Log)} \\
-  \hline
+\captionof{table}{Testes negativos obrigatórios — Casos 1 a 9}\label{tab:neg1}
+{\fontsize{7.2}{8.65}\selectfont
+\renewcommand{\arraystretch}{1.24}
+\begin{tabularx}{\linewidth}{@{}C{0.45cm} L{3.65cm} L{2.15cm} L{3.85cm} Y@{}}
+  \toprule
+  \textbf{\#} & \textbf{Cenário de Ataque ou Falha} & \textbf{Esperado} & \textbf{Teste / Mecanismo} & \textbf{Evidência Real de Execução} \\
+  \midrule
   \textbf{1} & ID Token com \code{alg="none"} (assinatura vazia) & Rejeitado & \bcode{test\_neg\_01\_id\_token\_alg\_none\_rejeitado}\newline\code{app/oidc.py:263} & \code{PASSED} — Exceção real:\newline\code{OidcAuthenticationError: Algoritmo de ID Token rejeitado: 'none'.} \\
-  \hline
-  \rowcolor{rowalt}\textbf{2} & ID Token reassinado em \code{HS256} usando a chave pública RSA (PEM) como segredo HMAC & Rejeitado & \bcode{test\_neg\_02\_id\_token\_reassinado\_hs256\_com\_chave\_publica\_rejeitado}\newline\code{app/oidc.py:20,263,284} & \code{PASSED} — Exceção real:\newline\code{OidcAuthenticationError: Algoritmo de ID Token rejeitado: 'HS256'.} \\
-  \hline
+  \midrule
+  \textbf{2} & ID Token reassinado em \code{HS256} usando a chave pública RSA (PEM) como segredo HMAC & Rejeitado & \bcode{test\_neg\_02\_id\_token\_reassinado\_hs256\_com\_chave\_publica\_rejeitado}\newline\code{app/oidc.py:20,263,284} & \code{PASSED} — Exceção real:\newline\code{OidcAuthenticationError: Algoritmo de ID Token rejeitado: 'HS256'.} \\
+  \midrule
   \textbf{3} & ID Token assinado validamente em RS256, mas com \code{aud="outro-client-id"} & Rejeitado & \bcode{test\_neg\_03\_id\_token\_aud\_outro\_client\_id\_rejeitado}\newline\code{app/oidc.py:337-338} & \code{PASSED} — Exceção real:\newline\code{OidcAuthenticationError: Claim aud do ID Token nao contem o client\_id da aplicacao.} \\
-  \hline
-  \rowcolor{rowalt}\textbf{4} & ID Token assinado validamente, mas com \bcode{iss="https://attacker.example"} & Rejeitado & \bcode{test\_neg\_04\_id\_token\_iss\_diferente\_rejeitado}\newline\code{app/oidc.py:317-318} & \code{PASSED} — Exceção real:\newline\code{OidcAuthenticationError: Claim iss do ID Token diverge do emissor esperado.} \\
-  \hline
-  \textbf{5} & ID Token com \code{exp} vencido (\code{now - 300s}, fora da tolerância de 60s) & Rejeitado & \bcode{test\_neg\_05\_id\_token\_exp\_vencido\_rejeitado}\newline\code{app/oidc.py:371-372} & \code{PASSED} — Exceção real:\newline\code{OidcAuthenticationError: ID Token expirado (claim exp vencido).} \\
-  \hline
-  \rowcolor{rowalt}\textbf{6} & ID Token com \code{iat} no futuro (\code{now + 600s}) & Rejeitado & \bcode{test\_neg\_06\_id\_token\_iat\_no\_futuro\_rejeitado}\newline\code{app/oidc.py:386-387} & \code{PASSED} — Exceção real:\newline\code{OidcAuthenticationError: Claim iat do ID Token esta no futuro.} \\
-  \hline
+  \midrule
+  \textbf{4} & ID Token assinado validamente, mas com \bcode{iss="https://attacker.example"} & Rejeitado & \bcode{test\_neg\_04\_id\_token\_iss\_diferente\_rejeitado}\newline\code{app/oidc.py:317-318} & \code{PASSED} — Exceção real:\newline\code{OidcAuthenticationError: Claim iss do ID Token diverge do emissor esperado.} \\
+  \midrule
+  \textbf{5} & ID Token com \code{exp} vencido (\code{now - 300s}, fora da tolerância de 60\,s) & Rejeitado & \bcode{test\_neg\_05\_id\_token\_exp\_vencido\_rejeitado}\newline\code{app/oidc.py:371-372} & \code{PASSED} — Exceção real:\newline\code{OidcAuthenticationError: ID Token expirado (claim exp vencido).} \\
+  \midrule
+  \textbf{6} & ID Token com \code{iat} no futuro (\code{now + 600s}) & Rejeitado & \bcode{test\_neg\_06\_id\_token\_iat\_no\_futuro\_rejeitado}\newline\code{app/oidc.py:386-387} & \code{PASSED} — Exceção real:\newline\code{OidcAuthenticationError: Claim iat do ID Token esta no futuro.} \\
+  \midrule
   \textbf{7} & ID Token com \bcode{nonce="nonce-atacante-replay"} divergente do enviado & Rejeitado & \bcode{test\_neg\_07\_id\_token\_nonce\_diferente\_rejeitado}\newline\code{app/oidc.py:399-400} & \code{PASSED} — Exceção real:\newline\code{OidcAuthenticationError: Claim nonce do ID Token diverge do valor enviado.} \\
-  \hline
-  \rowcolor{rowalt}\textbf{8} & \code{GET /callback} com \code{state} divergente ou ausente & Fluxo abortado antes da troca do \code{code} & \bcode{test\_neg\_08\_callback\_state\_divergente\_ou\_ausente\_aborta\_antes\_da\_troca}\newline\code{app/routes.py:96-98} & \code{PASSED} — \code{authenticate()} não foi invocado (\code{called=False}). Divergente $\to$ \code{HTTP 400}; Ausente $\to$ \code{HTTP 400}.\newline Log: \code{WARNING in routes: Callback rejeitado por estado ausente, expirado ou invalido.} \\
-  \hline
+  \midrule
+  \textbf{8} & \code{GET /callback} com \code{state} divergente ou ausente & Fluxo abortado antes da troca do \code{code} & \bcode{test\_neg\_08\_callback\_state\_divergente\_ou\_ausente\_aborta\_antes\_da\_troca}\newline\code{app/routes.py:96-98} & \code{PASSED} — \code{authenticate()} não invocado (\code{called=False}). Divergente $\to$ \code{HTTP 400}; Ausente $\to$ \code{HTTP 400}.\newline Log: \code{WARNING in routes: Callback rejeitado por estado ausente, expirado ou invalido.} \\
+  \midrule
   \textbf{9} & Reutilização do mesmo \code{authorization\_code} em \code{POST /token} & \code{invalid\_grant} e revogação dos tokens & \bcode{test\_neg\_09\_reutilizacao\_authorization\_code\_revoga\_tokens}\newline\code{auth\_server/routes.py:571-580} & \code{PASSED} — 1ª troca: \code{HTTP 200} (\code{/userinfo}=200, refresh ativo).\newline 2ª troca (replay): \code{HTTP 400 \{"error": "invalid\_grant", "error\_description": "Authorization code ja utilizado; todos os tokens associados foram revogados."\}}. Após replay: \code{/userinfo} $\to$ \code{HTTP 401} + \code{WWW-Authenticate: Bearer ... error\_description="Access token revogado ou expirado."}; \code{refresh\_ativo=False}. \\
-  \hline
+  \bottomrule
 \end{tabularx}
+\fonte{Elaboração dos autores.}
 }
 
-\vspace{6pt}
+\vspace{5pt}
 \begin{tcolorbox}[infobox]
-  {\fontsize{7.6}{9.5}\selectfont
-  \textbf{Nota técnica sobre o Caso \#9 (RFC 6749 \S4.1.2):} cada \code{authorization\_code} gerado em \code{auth\_server/storage.py:455-492} recebe um \code{grant\_id} único propagado tanto para \code{access\_tokens} quanto para \code{refresh\_tokens}. O consumo do código é atômico (\code{UPDATE authorization\_codes SET used\_at = ? WHERE code\_hash = ? AND used\_at IS NULL}); qualquer tentativa subsequente executa \code{revoke\_grant\_tokens(grant\_id)}, invalidando imediatamente todos os tokens derivados daquela concessão.}
+  {\fontsize{7.8}{9.6}\selectfont
+  \textbf{Nota técnica sobre o Caso \#9 (RFC 6749 \S4.1.2):} cada \code{authorization\_code} emitido em \code{auth\_server/storage.py:455-492} recebe um \code{grant\_id} exclusivo propagado aos registros de \code{access\_tokens} e \code{refresh\_tokens}. O consumo é atômico (\code{UPDATE authorization\_codes SET used\_at = ? WHERE code\_hash = ? AND used\_at IS NULL}); qualquer tentativa de reutilização dispara \code{revoke\_grant\_tokens(grant\_id)}, revogando imediatamente todos os tokens emitidos a partir daquele código.}
 \end{tcolorbox}
 
 \newpage
 % ==============================================================================
 % PÁGINA 5: TESTES NEGATIVOS (CASOS 10 A 15) + SAÍDA REAL DO PYTEST
 % ==============================================================================
-\secbanner{5}{Testes Negativos Obrigatórios (Continuação — Casos 10 a 15)}
-
-{\fontsize{7.15}{8.6}\selectfont
-\renewcommand{\arraystretch}{1.26}
-\begin{tabularx}{\linewidth}{|C{0.5cm}|L{3.9cm}|L{2.3cm}|L{3.9cm}|Y|}
-  \hline
-  \rowcolor{navy}\textcolor{white}{\bfseries \#} & \textcolor{white}{\bfseries Cenário de Ataque ou Falha} & \textcolor{white}{\bfseries Esperado} & \textcolor{white}{\bfseries Teste / Mecanismo} & \textcolor{white}{\bfseries Evidência Real de Execução (Exceção / HTTP / Log)} \\
-  \hline
-  \textbf{10} & \code{code\_verifier} incorreto em \code{POST /token} (não bate com SHA-256 do \code{code\_challenge}) & \code{invalid\_grant} & \bcode{test\_neg\_10\_code\_verifier\_incorreto\_no\_token}\newline\code{auth\_server/routes.py:601-607} & \code{PASSED} — Resposta real:\newline\code{HTTP 400 \{"error": "invalid\_grant", "error\_description": "code\_verifier nao corresponde ao code\_challenge."\}} \\
-  \hline
-  \rowcolor{rowalt}\textbf{11} & \code{redirect\_uri} com barra final extra (\code{/callback/}), parâmetro adicional (\code{?extra=1}), subcaminho (\code{/subcaminho}) ou host diferente & Rejeitado (comparação exata, sem 302) & \bcode{test\_neg\_11\_redirect\_uri\_variacoes\_rejeitadas\_sem\_redirecionar}\newline\code{auth\_server/routes.py:207-216} & \code{PASSED} (4 variações parametrizadas) — Todas retornaram \code{HTTP 400} e \code{Location=None}.\newline Log: \code{WARNING in routes: Requisicao /authorize rejeitada por redirect\_uri nao cadastrada.} \\
-  \hline
-  \textbf{12} & Alteração de 1 único bit em 1 byte da assinatura do ID Token (\code{sig\_bytes[10] \^{}= 0x01}) & Rejeitado & \bcode{test\_neg\_12\_um\_byte\_alterado\_na\_assinatura\_do\_id\_token\_rejeitado}\newline\code{app/oidc.py:280-296} & \code{PASSED} — Exceção real:\newline\code{OidcAuthenticationError: Assinatura ou estrutura do ID Token invalida: Signature verification failed} \\
-  \hline
-  \rowcolor{rowalt}\textbf{13} & Usuário autenticado com \code{role=user} tentando acessar \code{GET /admin} & \code{HTTP 403} & \bcode{test\_neg\_13\_acesso\_admin\_com\_role\_user\_retorna\_403}\newline\code{app/routes.py:156-163} & \code{PASSED} — Fluxo completo \code{usuario} (\code{/callback} $\to$ \code{302}) seguido de \code{GET /admin} $\to$ \code{HTTP 403} (verificado no servidor e confirmado no log ao vivo às 19:00:56). \\
-  \hline
+\captionof{table}{Testes negativos obrigatórios — Casos 10 a 15 (continuação)}\label{tab:neg2}
+{\fontsize{7.2}{8.65}\selectfont
+\renewcommand{\arraystretch}{1.24}
+\begin{tabularx}{\linewidth}{@{}C{0.45cm} L{3.65cm} L{2.15cm} L{3.85cm} Y@{}}
+  \toprule
+  \textbf{\#} & \textbf{Cenário de Ataque ou Falha} & \textbf{Esperado} & \textbf{Teste / Mecanismo} & \textbf{Evidência Real de Execução} \\
+  \midrule
+  \textbf{10} & \code{code\_verifier} incorreto em \code{POST /token} (diverge do SHA-256 de \code{code\_challenge}) & \code{invalid\_grant} & \bcode{test\_neg\_10\_code\_verifier\_incorreto\_no\_token}\newline\code{auth\_server/routes.py:601-607} & \code{PASSED} — Resposta real:\newline\code{HTTP 400 \{"error": "invalid\_grant", "error\_description": "code\_verifier nao corresponde ao code\_challenge."\}} \\
+  \midrule
+  \textbf{11} & \code{redirect\_uri} com barra final extra (\code{/callback/}), parâmetro adicional (\code{?extra=1}), subcaminho (\code{/subcaminho}) ou host diferente & Rejeitado (comparação exata, sem 302) & \bcode{test\_neg\_11\_redirect\_uri\_variacoes\_rejeitadas\_sem\_redirecionar}\newline\code{auth\_server/routes.py:207-216} & \code{PASSED} (4 variações parametrizadas) — Todas retornaram \code{HTTP 400} e \code{Location=None}.\newline Log: \code{WARNING in routes: Requisicao /authorize rejeitada por redirect\_uri nao cadastrada.} \\
+  \midrule
+  \textbf{12} & Alteração de 1 bit em 1 byte da assinatura do ID Token (\code{sig\_bytes[10] \^{}= 0x01}) & Rejeitado & \bcode{test\_neg\_12\_um\_byte\_alterado\_na\_assinatura\_do\_id\_token\_rejeitado}\newline\code{app/oidc.py:280-296} & \code{PASSED} — Exceção real:\newline\code{OidcAuthenticationError: Assinatura ou estrutura do ID Token invalida: Signature verification failed} \\
+  \midrule
+  \textbf{13} & Usuário autenticado com \code{role=user} tentando acessar \code{GET /admin} & \code{HTTP 403} & \bcode{test\_neg\_13\_acesso\_admin\_com\_role\_user\_retorna\_403}\newline\code{app/routes.py:156-163} & \code{PASSED} — Fluxo completo \code{usuario} (\code{/callback} $\to$ \code{302}) seguido de \code{GET /admin} $\to$ \code{HTTP 403} (verificado no servidor e confirmado no log ao vivo às 19:00:56). \\
+  \midrule
   \textbf{14} & Acesso a \code{GET /userinfo} sem token ou com access token expirado & \code{HTTP 401} + \code{WWW-Authenticate} & \bcode{test\_neg\_14\_userinfo\_sem\_token\_ou\_expirado\_retorna\_401\_www\_authenticate}\newline\code{auth\_server/routes.py:694-712} & \code{PASSED} — Sem token: \code{HTTP 401} + \code{WWW-Authenticate: Bearer realm="userinfo", error="invalid\_token", error\_description="Bearer access token ausente."}.\newline Expirado: \code{HTTP 401} + \code{WWW-Authenticate: Bearer ... error\_description="Access token invalido ou expirado."}. \\
-  \hline
-  \rowcolor{rowalt}\textbf{15} & Tentativas repetidas de login (força bruta) no formulário de \code{POST /authorize} & Bloqueio por rate limiting & \bcode{test\_neg\_15\_tentativa\_login\_repetida\_bloqueio\_rate\_limiting}\newline\code{auth\_server/routes.py:357-381} & \code{PASSED} — Tentativas 1--5: \code{[401, 401, 401, 401, 401]} com mensagem genérica. 6ª tentativa (mesmo com senha correta): \code{HTTP 429} + \code{Retry-After: 299}.\newline Log: \code{WARNING in routes: Login bloqueado por rate limiting.} \\
-  \hline
+  \midrule
+  \textbf{15} & Tentativas repetidas de login (força bruta) no formulário de \code{POST /authorize} & Bloqueio por rate limiting & \bcode{test\_neg\_15\_tentativa\_login\_repetida\_bloqueio\_rate\_limiting}\newline\code{auth\_server/routes.py:357-381} & \code{PASSED} — Tentativas 1--5: \code{[401, 401, 401, 401, 401]} com mensagem genérica. 6ª tentativa (mesmo com senha correta): \code{HTTP 429} + \code{Retry-After: 299}.\newline Log: \code{WARNING in routes: Login bloqueado por rate limiting.} \\
+  \bottomrule
 \end{tabularx}
+\fonte{Elaboração dos autores.}
 }
 
-\vspace{4pt}
-\subsec{5.1 Saída Real Consolidada da Suíte Automatizada (\code{.\textbackslash.venv\textbackslash Scripts\textbackslash python.exe -m pytest -v})}
-\begin{lstlisting}[style=darkcode]
+\subsection{Saída Real Consolidada da Suíte Automatizada (\texttt{pytest -v})}
+\begin{lstlisting}
 platform win32 -- Python 3.12.10, pytest-8.4.2, pluggy-1.7.0
 collecting ... collected 24 items
 
@@ -611,69 +551,70 @@ tests/test_security_suite.py::test_implicit_proibido_callback_access_denied_e_ro
 
 \newpage
 % ==============================================================================
-% PÁGINA 6: JUSTIFICATIVA DE ALGORITMOS, TTLs, POLÍTICA SUB E CONFORMIDADE
+% PÁGINA 6: ALGORITMOS, TTLs, POLÍTICA SUB, DON'TS E REFERÊNCIAS
 % ==============================================================================
-\secbanner{6}{Justificativa de Algoritmos Criptográficos e Tempos de Vida}
+\section{Justificativa de Algoritmos Criptográficos e Tempos de Vida}
 
-\subsec{6.1 Escolhas Criptográficas}
-{\fontsize{7.2}{8.7}\selectfont
-\renewcommand{\arraystretch}{1.22}
-\begin{tabularx}{\linewidth}{|L{3.2cm}|L{3.2cm}|Y|}
-  \hline
-  \rowcolor{navy}\textcolor{white}{\bfseries Mecanismo} & \textcolor{white}{\bfseries Escolha Adotada} & \textcolor{white}{\bfseries Justificativa Técnica e Referência} \\
-  \hline
-  \textbf{Assinatura de Tokens (JWS)} & \code{RS256} (RSA-2048 + SHA-256) com \code{kid} & Criptografia assimétrica separa emissão (chave privada exclusiva do OP) de verificação (chave pública publicada em \code{/jwks.json}). Elimina segredo simétrico compartilhado (\code{HS256}) e viabiliza rotação sem indisponibilidade mantendo o \code{kid} antigo na transição (OIDC Core \S10.1; RFC 8725 \S3.1). \\
-  \hline
-  \rowcolor{rowalt}\textbf{Lista Fixa de Algoritmos} & \code{("RS256",)} hardcoded & O cliente nunca usa o cabeçalho \code{alg} do token recebido para escolher o verificador, bloqueando \code{alg="none"} e confusão de algoritmo RS256$\to$HS256 (RFC 8725 \S2.1, \S3.1). \\
-  \hline
-  \textbf{PKCE} & \code{S256} (SHA-256 + Base64URL) & Impede que um interceptador do \code{authorization\_code} no canal do navegador conclua a troca em \code{/token} sem o \code{code\_verifier} de 256 bits retido no servidor. O método \code{plain} é recusado (RFC 7636; RFC 9700 \S2.1). \\
-  \hline
-  \rowcolor{rowalt}\textbf{Hash de Senhas (OP)} & \code{Argon2id} (\code{argon2-cffi}) & Algoritmo \emph{memory-hard} com sal aleatório por usuário, resistente a ataques paralelos em GPU/ASIC e canais laterais. A verificação fictícia (\code{\_DUMMY\_PASSWORD\_HASH}) reduz vazamento de existência de conta por tempo de resposta (\code{auth\_server/storage.py:18-19,280-282}). \\
-  \hline
-  \textbf{Hash de \code{client\_secret} e Tokens no Banco} & \code{scrypt} (secret) / \code{SHA-256} (codes e refresh) & O \code{client\_secret} nunca é armazenado em texto claro (\code{scrypt} salgado + \code{hmac.compare\_digest}). Códigos de autorização e refresh tokens são persistidos apenas como digest SHA-256 (\code{auth\_server/storage.py:129-157}). \\
-  \hline
-  \rowcolor{rowalt}\textbf{Identificadores Aleatórios} & 256 bits (\bcode{secrets.token\_urlsafe(32)}) & Excede o mínimo de 128 bits exigido para \code{state}, \code{nonce}, \code{code\_verifier}, \code{code}, \code{jti} e \code{session\_id}, prevenindo adivinhação e colisão (RFC 6749 \S10.10). \\
-  \hline
+\captionof{table}{Escolhas criptográficas e justificativas técnicas}
+{\fontsize{7.2}{8.6}\selectfont
+\renewcommand{\arraystretch}{1.18}
+\begin{tabularx}{\linewidth}{@{}L{3.0cm} L{3.1cm} Y@{}}
+  \toprule
+  \textbf{Mecanismo} & \textbf{Escolha Adotada} & \textbf{Justificativa Técnica e Referência} \\
+  \midrule
+  \textbf{Assinatura de Tokens (JWS)} & \code{RS256} (RSA-2048 + SHA-256) com \code{kid} & Criptografia assimétrica separa emissão (chave privada exclusiva do OP) de verificação (chave pública em \code{/jwks.json}). Elimina segredo simétrico compartilhado (\code{HS256}) e permite rotação sem indisponibilidade mantendo o \code{kid} antigo na transição (OIDC Core \S10.1; RFC 8725 \S3.1). \\
+  \textbf{Lista Fixa de Algoritmos} & \code{("RS256",)} hardcoded & O cliente nunca seleciona o algoritmo a partir do cabeçalho \code{alg} do token recebido, bloqueando \code{alg="none"} e confusão RS256$\to$HS256 (RFC 8725 \S2.1, \S3.1). \\
+  \textbf{PKCE} & \code{S256} (SHA-256 + Base64URL) & Impede que um interceptador do \code{authorization\_code} conclua a troca em \code{/token} sem o \code{code\_verifier} de 256 bits retido no servidor; método \code{plain} recusado (RFC 7636; RFC 9700 \S2.1). \\
+  \textbf{Hash de Senhas (OP)} & \code{Argon2id} (\code{argon2-cffi}) & Algoritmo \emph{memory-hard} com sal aleatório por usuário, resistente a GPU/ASIC. A verificação fictícia (\code{\_DUMMY\_PASSWORD\_HASH}) mitiga enumeração por tempo de resposta (\code{auth\_server/storage.py:18-19,280-282}). \\
+  \textbf{Segredos e Tokens no Banco} & \code{scrypt} (secret) / \code{SHA-256} (codes e refresh) & \code{client\_secret} armazenado com \code{scrypt} salgado e comparação \code{hmac.compare\_digest}; códigos e refresh tokens persistidos apenas como hash SHA-256 (\code{auth\_server/storage.py:129-157}). \\
+  \textbf{Identificadores Aleatórios} & 256 bits (\bcode{secrets.token\_urlsafe(32)}) & Supera o mínimo de 128 bits exigido para \code{state}, \code{nonce}, \code{code\_verifier}, \code{code}, \code{jti} e \code{session\_id}, impedindo adivinhação e colisão (RFC 6749 \S10.10). \\
+  \bottomrule
 \end{tabularx}
+\fonte{Elaboração dos autores.}
 }
 
-\subsec{6.2 Tempos de Vida (TTLs) e Limites Operacionais}
-{\fontsize{7.2}{8.7}\selectfont
-\renewcommand{\arraystretch}{1.22}
-\begin{tabularx}{\linewidth}{|L{3.7cm}|L{2.8cm}|Y|}
-  \hline
-  \rowcolor{navy}\textcolor{white}{\bfseries Artefato / Controle} & \textcolor{white}{\bfseries Valor Adotado} & \textcolor{white}{\bfseries Justificativa de Segurança e Configuração} \\
-  \hline
-  \code{authorization\_code} & \textbf{60 segundos} (uso único) & Limite máximo exigido pelo enunciado (\code{AUTH\_SERVER\_CODE\_TTL=60}, validado entre 1 e 60s em \code{auth\_server/config.py:30}). Consumo atômico; replay revoga todos os tokens do \code{grant\_id}. \\
-  \hline
-  \rowcolor{rowalt}\code{id\_token} e \code{access\_token} & \textbf{900 segundos} (15 min) & Janela curta reduz impacto de eventual comprometimento do access token em \code{/userinfo} e segue a recomendação da Seção 2.5 (\code{AUTH\_SERVER\_TOKEN\_TTL=900}). \\
-  \hline
-  Tolerância de relógio (\code{clock\_skew}) & \textbf{60 segundos} & Absorve pequenas dessincronizações entre servidores sem enfraquecer a checagem de \code{exp} e \code{iat} (\code{OIDC\_CLOCK\_SKEW\_SECONDS=60}). \\
-  \hline
-  \rowcolor{rowalt}\code{refresh\_token} & \textbf{86.400 segundos} (24 h) & Emitido vinculado ao \code{grant\_id} e ao \code{client\_id}, revogado imediatamente em replay de código (\code{AUTH\_SERVER\_REFRESH\_TTL=86400}). \\
-  \hline
-  Sessão local (RP e OP) & \textbf{30 min} inatividade / \textbf{8 h} absoluta & Equilibra usabilidade durante a jornada com expiração determinística mesmo sob uso contínuo (\code{SESSION\_IDLE\_TTL=1800}, \code{SESSION\_TTL=28800}), com rotação no login e descarte no logout. \\
-  \hline
-  \rowcolor{rowalt}Fluxo pendente (\code{oidc\_flow} / \code{authorize\_requests}) & \textbf{300 segundos} (5 min) & Tempo suficiente para digitar credenciais e consentir, com consumo único atômico (\code{DELETE ... RETURNING}) para impedir reutilização de estado. \\
-  \hline
-  Rate limiting no login (OP) & \textbf{5 falhas / 300 s} & Rastreia chaves por IP e por usuário (\code{auth\_server/routes.py:357-381}), bloqueando força bruta com \code{HTTP 429} + \code{Retry-After} e mensagem genérica sem revelar existência do usuário. \\
-  \hline
+\vspace{2pt}
+\captionof{table}{Tempos de vida (TTLs) e limites operacionais adotados}
+{\fontsize{7.2}{8.6}\selectfont
+\renewcommand{\arraystretch}{1.18}
+\begin{tabularx}{\linewidth}{@{}L{3.5cm} L{2.7cm} Y@{}}
+  \toprule
+  \textbf{Artefato / Controle} & \textbf{Valor Adotado} & \textbf{Justificativa de Segurança e Configuração} \\
+  \midrule
+  \code{authorization\_code} & \textbf{60\,s} (uso único) & Limite máximo do enunciado (\code{AUTH\_SERVER\_CODE\_TTL=60}, validado em \code{auth\_server/config.py:30}). Consumo atômico; replay revoga todos os tokens do \code{grant\_id}. \\
+  \code{id\_token} e \code{access\_token} & \textbf{900\,s} (15\,min) & Janela curta reduz impacto de eventual vazamento do access token em \code{/userinfo} e segue a Seção 2.5 (\code{AUTH\_SERVER\_TOKEN\_TTL=900}). \\
+  Tolerância de relógio & \textbf{60\,s} & Absorve desvios leves de relógio sem enfraquecer \code{exp} e \code{iat} (\code{OIDC\_CLOCK\_SKEW\_SECONDS=60}). \\
+  \code{refresh\_token} & \textbf{86.400\,s} (24\,h) & Vinculado a \code{grant\_id} e \code{client\_id}, revogado imediatamente em replay (\code{AUTH\_SERVER\_REFRESH\_TTL=86400}). \\
+  Sessão local (RP e OP) & \textbf{30\,min} ociosa / \textbf{8\,h} abs. & Equilibra usabilidade com expiração determinística (\code{SESSION\_IDLE\_TTL=1800}, \code{SESSION\_TTL=28800}), rotação no login e invalidação no logout. \\
+  Fluxo pendente & \textbf{300\,s} (5\,min) & Tempo suficiente para login/consentimento, com consumo único atômico (\code{DELETE ... RETURNING}). \\
+  Rate limiting (OP) & \textbf{5 falhas / 300\,s} & Controlado por IP e por usuário (\code{auth\_server/routes.py:357-381}), bloqueando força bruta com \code{HTTP 429} + \code{Retry-After} e mensagem genérica. \\
+  \bottomrule
 \end{tabularx}
+\fonte{Elaboração dos autores.}
 }
 
-\secbanner{7}{Comportamento Quando \texttt{sub} Não Existe na Tabela Local (Item 4.2.10)}
+\section{Comportamento Quando \texttt{sub} Não Existe na Tabela Local (Item 4.2.10)}
 \begin{tcolorbox}[warnbox]
-  {\fontsize{7.5}{9.3}\selectfont
-  \textbf{Política adotada: Recusa explícita sem auto-provisionamento (\emph{Fail-Closed}).}\par\vspace{1.5pt}
-  Somente após concluir integralmente as verificações criptográficas e de claims (itens 1--8 e 10 do checklist), a Aplicação Cliente busca o par \code{(oidc\_issuer, oidc\_sub)} na tabela \code{users} (\code{app/storage.py:117-122}). Quando o \code{sub} não está previamente cadastrado (\code{user is None} em \code{app/routes.py:121-124}), o login é \textbf{recusado com HTTP 403} (\code{"Esta identidade nao tem acesso a aplicacao."}), nenhuma conta é criada automaticamente, nenhuma sessão local é aberta e o evento é registrado em log. Essa decisão aplica o princípio do menor privilégio: o Provedor de Identidade comprova \emph{quem} o usuário é (autenticação), mas o provisionamento local controla \emph{quem pode entrar} na aplicação, evitando criação indevida de contas por identidades não autorizadas.}
+  {\fontsize{7.7}{9.4}\selectfont
+  \textbf{Política adotada: Recusa explícita sem auto-provisionamento (\emph{Fail-Closed}).}\par\vspace{1pt}
+  Somente após concluir integralmente as verificações criptográficas e de claims (itens 1--8 e 10 do checklist), a Aplicação Cliente busca o par \code{(oidc\_issuer, oidc\_sub)} na tabela \code{users} (\code{app/storage.py:117-122}). Quando o \code{sub} não existe previamente (\code{user is None} em \code{app/routes.py:121-124}), o login é \textbf{recusado com HTTP 403} (\code{"Esta identidade nao tem acesso a aplicacao."}), nenhuma conta é criada automaticamente, nenhuma sessão é aberta e o evento é registrado em log. A escolha aplica o princípio do menor privilégio: o Provedor comprova a identidade (autenticação), enquanto o cadastro local controla quem tem acesso à aplicação.}
 \end{tcolorbox}
 
-\secbanner{8}{Conformidade com os DON'TS (Item 1.2) e Higiene do Repositório}
-\begin{itemize}\fontsize{7.5}{9.2}\selectfont
-  \item \textbf{Proibição de ROPC e Implicit:} \code{grant\_type=password} retorna \code{400 unsupported\_grant\_type} e \code{response\_type=token} retorna \code{400 invalid\_request} (sem redirecionamento). A aplicação cliente nunca recebe, vê ou armazena senhas.
-  \item \textbf{Transporte Seguro (TLS):} ambos os serviços recusam tráfego sem HTTPS (\code{abort(400)}), exceto em loopback (\code{localhost}/\code{127.0.0.1}) com \bcode{ALLOW\_LOCAL\_HTTP=true} apenas para desenvolvimento (RFC 6749 \S3.1/\S3.2).
-  \item \textbf{Ausência de Segredos Versionados:} auditoria completa do repositório e do histórico Git confirmou ausência de \code{.env}, chaves privadas (\code{.pem}), bancos SQLite ou credenciais reais. O binário local \code{mkcert.exe.exe}, versionado por engano, foi removido e o padrão \code{mkcert*.exe} adicionado ao \code{.gitignore}.
-  \item \textbf{Referências Normativas Aplicadas:} RFC 6749 (OAuth 2.0), RFC 6750 (Bearer), RFC 7636 (PKCE), RFC 7519 (JWT), RFC 8725 (JWT BCP), RFC 9700 (OAuth 2.0 Security BCP) e OpenID Connect Core 1.0.
+\section{Conformidade com os DON'TS (Item 1.2) e Referências}
+\begin{itemize}\fontsize{7.5}{9.0}\selectfont
+  \item \textbf{ROPC e Implicit proibidos:} \code{grant\_type=password} retorna \code{400 unsupported\_grant\_type} e \code{response\_type=token} retorna \code{400 invalid\_request} sem redirecionar; o cliente nunca recebe, vê ou armazena senhas.
+  \item \textbf{Transporte TLS e higiene do repositório:} ambos os serviços exigem HTTPS (\code{abort(400)}), admitindo HTTP apenas em loopback (\code{localhost}/\code{127.0.0.1}) com \bcode{ALLOW\_LOCAL\_HTTP=true} para desenvolvimento. Auditoria completa confirmou ausência de \code{.env}, chaves privadas (\code{.pem}), bancos SQLite ou credenciais no repositório e histórico Git; o binário local \code{mkcert.exe.exe} foi removido e \code{mkcert*.exe} adicionado ao \code{.gitignore}.
 \end{itemize}
+
+\vspace{2pt}
+{\noindent\fontsize{7.2}{8.7}\selectfont\color{slate700}
+\textbf{Referências Normativas:}
+RFC 6749 (\emph{OAuth 2.0 Authorization Framework});
+RFC 6750 (\emph{Bearer Token Usage});
+RFC 7519 (\emph{JSON Web Token});
+RFC 7636 (\emph{PKCE});
+RFC 8725 (\emph{JWT Best Current Practices});
+RFC 9700 (\emph{Best Current Practice for OAuth 2.0 Security});
+OpenID Foundation (\emph{OpenID Connect Core 1.0}).}
 
 \end{document}

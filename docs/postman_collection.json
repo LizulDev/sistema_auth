@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "Cyber Security 33506 — OAuth 2.0 + OIDC (Opcao 1)",
-    "description": "Colecao de requisicoes dos endpoints do Servidor de Autorizacao (porta 8001) e da Aplicacao Cliente (porta 8000), incluindo cenarios positivos e negativos.",
+    "description": "Colecao de requisicoes dos endpoints do Servidor de Autorizacao (HTTP 8001 / HTTPS 8443) e da Aplicacao Cliente (HTTP 8000 / HTTPS 8444), incluindo cenarios positivos e negativos. Ajuste op_base_url, client_base_url e redirect_uri conforme o modo HTTP ou HTTPS configurado no .env.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -147,6 +147,22 @@
           "request": {
             "method": "GET",
             "url": "{{client_base_url}}/admin"
+          }
+        },
+        {
+          "name": "POST /logout (Encerrar sessao na Aplicacao Cliente)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/x-www-form-urlencoded" }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "csrf_token", "value": "COLE_O_CSRF_TOKEN_DA_SESSAO" }
+              ]
+            },
+            "url": "{{client_base_url}}/logout"
           }
         }
       ]

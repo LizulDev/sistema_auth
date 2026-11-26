@@ -23,6 +23,8 @@ Principais arquivos:
 - `scripts/seed.py`: cadastro do cliente OAuth e dos usuários de demonstração.
 - `tests/test_security_suite.py`: testes automatizados.
 - `docs/postman_collection.json`: coleção de requisições.
+- `docs/relatorio.pdf`: relatório técnico da avaliação (fonte em `docs/relatorio.html`).
+- `docs/roteiro-demo.md`: roteiro para a demonstração ao vivo.
 - `.env.example`: modelo de configuração sem segredos reais.
 - `instance/`: bancos e chaves gerados localmente.
 
@@ -468,7 +470,7 @@ git diff --check
 Confira se arquivos locais já estão rastreados:
 
 ```powershell
-git ls-files .env instance cert.pem key.pem rootCA.pem rootCA-key.pem mkcert.exe
+git ls-files .env instance cert.pem key.pem rootCA.pem rootCA-key.pem "mkcert*.exe"
 ```
 
 O `.gitignore` não remove arquivos já rastreados. Se necessário, use `git rm --cached` somente nos caminhos identificados, preservando os arquivos locais.

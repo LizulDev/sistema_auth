@@ -20,6 +20,7 @@ rootCA-key.pem
 
 # Ferramenta local
 mkcert.exe
+mkcert*.exe
 
 # Logs
 *.log

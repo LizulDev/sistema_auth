@@ -853,3 +853,99 @@ def test_azp_com_multiplos_aud_e_mascara_log_callback(env):
     CallbackQueryMaskFilter().filter(record)
     assert "SUPER_SECRET_CODE" not in record.getMessage()
     assert "/callback?[REDACTED]" in record.getMessage()
+
+
+def test_kid_desconhecido_sub_nao_cadastrado_e_userinfo_sub_divergente(env, monkeypatch):
+    """Cobre checklist #1 (kid inexistente), item 4.2(10) (sub nao cadastrado -> 403) e checklist #10 (/userinfo sub divergente)."""
+    # Checklist #1: kid inexistente no JWKS -> erro
+    valid_token = env["op_keys"].sign_jwt(_valid_id_token_payload())
+    with pytest.raises(OidcAuthenticationError, match="Chave publica nao encontrada"):
+        validate_id_token(
+            valid_token,
+            jwks={"keys": []},
+            expected_issuer=ISSUER,
+            expected_client_id=CLIENT_ID,
+            expected_nonce="expected-nonce-123",
+        )
+
+    # Item 4.2(10): usuario existe no OP, mas sub nao existe na tabela local -> recusa com HTTP 403 (sem auto-provisionamento)
+    env["op_store"].upsert_user(
+        username="desconhecido",
+        password="UnknownUserPass#2026",
+        sub="9999999999",
+        full_name="Usuario Nao Provisionado",
+        email="desconhecido@unoesc.local",
+        role="user",
+        email_verified=True,
+    )
+    cb_unknown = _complete_full_browser_login(
+        env, username="desconhecido", password="UnknownUserPass#2026"
+    )
+    assert cb_unknown.status_code == 403
+    assert env["rp_client"].get("/admin", base_url="http://localhost:8000").status_code == 401
+
+    # Checklist #10: /userinfo devolvendo sub diferente do ID Token -> rejeitado
+    monkeypatch.setattr(
+        "app.oidc.fetch_userinfo",
+        lambda *_args, **_kwargs: {"sub": "outro-sub-divergente", "name": "Outro"},
+    )
+    _, params, verifier = _run_authorize_and_consent(
+        env["op_client"],
+        username="admin",
+        password="AdminTestPassword#2026",
+        nonce="nonce-ui-mismatch",
+    )
+    pending = AuthorizationRequest(state="s", nonce="nonce-ui-mismatch", verifier=verifier)
+    with pytest.raises(OidcAuthenticationError, match="diverge"):
+        authenticate(
+            env["client_settings"],
+            params["code"][0],
+            pending,
+            http_client=env["http_client_factory"](),
+        )
+
+
+def test_implicit_proibido_callback_access_denied_e_rotacao_sessao(env):
+    """Cobre secao 1.2 (response_type=token proibido), secao 4.6 (error=access_denied) e secao 4.4 (rotacao de session_id)."""
+    # Secao 1.2: fluxo Implicit proibido
+    implicit_resp = env["op_client"].get(
+        "/authorize",
+        query_string={
+            "response_type": "token",
+            "client_id": CLIENT_ID,
+            "redirect_uri": REDIRECT_URI,
+            "scope": "openid profile email",
+            "state": "state-implicit",
+            "nonce": "nonce-implicit",
+            "code_challenge": "a" * 43,
+            "code_challenge_method": "S256",
+        },
+        base_url=ISSUER,
+    )
+    assert implicit_resp.status_code == 400
+    assert "Location" not in implicit_resp.headers
+
+    # Secao 4.6: callback com error=access_denied e state valido -> 400 amigavel, sem sessao
+    rp_client = env["rp_client"]
+    init = rp_client.get("/login", base_url="http://localhost:8000")
+    state = parse_qs(urlsplit(init.headers["Location"]).query)["state"][0]
+    denied = rp_client.get(
+        f"/callback?error=access_denied&error_description=Recusado&state={state}",
+        base_url="http://localhost:8000",
+    )
+    assert denied.status_code == 400
+    assert "session_id=" not in " ".join(denied.headers.getlist("Set-Cookie"))
+
+    # Secao 4.4: rotacao do session_id no login
+    cb1 = _complete_full_browser_login(env, username="admin", password="AdminTestPassword#2026")
+    assert cb1.status_code == 302
+    cookies1 = " ".join(cb1.headers.getlist("Set-Cookie"))
+    sid1 = re.search(r"session_id=([^;]+)", cookies1).group(1)
+
+    cb2 = _complete_full_browser_login(env, username="admin", password="AdminTestPassword#2026")
+    assert cb2.status_code == 302
+    cookies2 = " ".join(cb2.headers.getlist("Set-Cookie"))
+    sid2 = re.search(r"session_id=([^;]+)", cookies2).group(1)
+    assert sid1 != sid2
+    assert env["client_store"].read_session(sid1) is None
+    assert env["client_store"].read_session(sid2) is not None

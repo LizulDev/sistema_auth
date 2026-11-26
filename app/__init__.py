@@ -37,6 +37,7 @@ def _install_log_filter() -> None:
 
 def create_app(test_config: dict | None = None) -> Flask:
     app = Flask(__name__, instance_relative_config=True)
+    app.logger.setLevel(logging.INFO)
     _install_log_filter()
 
     if test_config and "ALLOW_LOCAL_HTTP" in test_config:

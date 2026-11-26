@@ -1,161 +1,476 @@
-# Autenticação e Autorização — OAuth 2.0 + OpenID Connect (Opção 1)
+# Autenticação e Autorização — OAuth 2.0 + OpenID Connect
 
-Implementação completa em **Python + Flask + SQLite** para a Avaliação A1/3 de Cyber Security (33506 — UNOESC, 2026), utilizando a **Opção 1**: **Servidor de Autorização próprio (OpenID Provider)** + **Aplicação Cliente (Relying Party)** com fluxo **Authorization Code (RFC 6749)**, **PKCE S256 (RFC 7636)** e **OpenID Connect Core 1.0**.
+Projeto em **Python, Flask e SQLite** para a Avaliação A1/3 de Cyber Security — 33506, UNOESC, 2026.
 
-> **Zero JavaScript no back-end e renderização 100% no servidor**: tokens nunca são expostos a scripts ou `localStorage`.
+Implementa a **Opção 1**: servidor de autorização próprio (OpenID Provider) e aplicação cliente (Relying Party), com Authorization Code, PKCE S256 e OpenID Connect.
 
----
+As páginas são renderizadas no servidor. Os tokens são processados no backend, sem armazenamento em `localStorage`.
 
 ## Arquitetura
 
-| Componente | Pacote | Porta padrão | Responsabilidade |
-| --- | --- | --- | --- |
-| **Servidor de Autorização (OpenID Provider)** | `auth_server/` | `8001` | Descoberta OIDC, publicação de chaves RSA (JWKS), autenticação de usuários (Argon2id + rate limiting), consentimento explícito, emissão de `authorization_code` (TTL <= 60s), troca `/token` (RS256), `/userinfo` (Bearer) e `/logout`. |
-| **Aplicação Cliente (Relying Party)** | `app/` | `8000` | Geração de `state`, `nonce` e PKCE `S256`, callback protegido, descoberta OIDC, troca única do código (sem retry), decomposição e validação completa do ID Token (checklist 4.3), vínculo por `(oidc_issuer, oidc_sub)`, sessão local segura e autorização por `role` em `/admin`. |
+| Componente | Pacote | HTTP local | HTTPS local | Responsabilidade |
+|---|---|---|---|---|
+| Servidor de autorização | `auth_server/` | `8001` | `8443` | Login, consentimento, descoberta OIDC, JWKS, emissão de tokens, userinfo e logout |
+| Aplicação cliente | `app/` | `8000` | `8444` | Início do login, callback, validação do ID Token, sessão local e autorização |
 
-### Estrutura de arquivos
+Principais arquivos:
 
-```text
-├── app/                         # Aplicação Cliente (Relying Party)
-│   ├── __init__.py              # Fábrica Flask, política TLS, headers e máscara de logs de /callback
-│   ├── config.py                # Configurações OIDC via variáveis de ambiente
-│   ├── oidc.py                  # Descoberta, PKCE S256, troca /token, decomposição e validação do ID Token
-│   ├── routes.py                # /, /login, /callback, /admin (role=admin), /logout
-│   ├── storage.py               # SQLite: users (iss+sub), pending_authorizations, sessions
-│   └── templates/               # HTML renderizado no servidor (index.html, admin.html)
-├── auth_server/                 # Servidor de Autorização próprio (OpenID Provider)
-│   ├── __init__.py              # Fábrica Flask, política TLS, headers e proteção de logs
-│   ├── config.py                # Configurações do provedor (issuer, TTLs, rate limit)
-│   ├── keys.py                  # Geração de chaves RSA em instance/, assinatura RS256, JWKS e rotação
-│   ├── routes.py                # /.well-known/openid-configuration, /jwks.json, /authorize, /token, /userinfo, /logout
-│   ├── storage.py               # SQLite: op_users (Argon2id), oauth_clients, codes, tokens, revogação, rate limit
-│   └── templates/               # HTML renderizado no servidor (index, login, consent, error)
-├── scripts/seed.py              # Inicialização de cliente OAuth e usuários de demonstração (admin e user)
-├── tests/test_security_suite.py # Suíte pytest cobrindo os 15 testes negativos obrigatórios + fluxos E2E
-├── docs/postman_collection.json # Coleção Postman v2.1 de todos os endpoints
-├── .env.example                 # Modelo de variáveis de ambiente (sem segredos reais)
-└── requirements.txt             # Dependências Python
-```
+- `app/config.py`: configurações OIDC da aplicação cliente.
+- `app/oidc.py`: descoberta, PKCE, troca do código e validação do ID Token.
+- `app/routes.py`: rotas da aplicação cliente.
+- `app/storage.py`: usuários locais, autorizações pendentes e sessões.
+- `auth_server/`: implementação do provedor OIDC.
+- `scripts/seed.py`: cadastro do cliente OAuth e dos usuários de demonstração.
+- `tests/test_security_suite.py`: testes automatizados.
+- `docs/postman_collection.json`: coleção de requisições.
+- `.env.example`: modelo de configuração sem segredos reais.
+- `instance/`: bancos e chaves gerados localmente.
 
----
+## Requisitos
 
-## Política de segredos
+- Python 3.11 ou superior.
+- SQLite 3.35 ou superior.
+- PowerShell para executar os comandos deste guia.
+- mkcert para a configuração HTTPS local.
 
-Nunca versione `.env`, `client_secret`, chaves privadas RSA (`*.pem`, `*.key`), bancos SQLite (`*.sqlite3`), `instance/` ou `.venv/`. Todos estão bloqueados em `.gitignore`.
+O servidor iniciado por `flask run` destina-se ao desenvolvimento local.
 
----
+## 1. Preparar o ambiente
 
-## Como executar localmente (HTTP em `localhost`)
-
-Requer **Python 3.11+** e **SQLite 3.35+**. No PowerShell, a partir da raiz do projeto:
-
-### 1. Criar ambiente virtual e instalar dependências
+Execute os comandos na raiz de `sistema_auth`:
 
 ```powershell
 python -m venv .venv
-./.venv/Scripts/python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
 ```
 
-### 2. Configurar variáveis de ambiente locais
-
-Copie `.env.example` para `.env` e defina valores fortes para `OIDC_CLIENT_SECRET`, `SEED_ADMIN_PASSWORD` e `SEED_USER_PASSWORD`:
+Na primeira configuração, copie o modelo:
 
 ```powershell
 Copy-Item .env.example .env
 ```
 
-### 3. Executar o seed (inicializa bancos, chave RSA em `instance/keys/` e usuários demo)
+Não sobrescreva um `.env` já configurado.
+
+Gere um segredo para a aplicação:
 
 ```powershell
-./.venv/Scripts/python.exe scripts/seed.py
+.\.venv\Scripts\python.exe -c "import secrets; print(secrets.token_urlsafe(48))"
 ```
 
-Para demonstrar **rotação de chave RSA** mantendo a chave anterior publicada em `/jwks.json`:
+Copie o resultado para `OIDC_CLIENT_SECRET` no `.env`. Defina também senhas próprias:
+
+```env
+OIDC_CLIENT_ID=app-cybersecurity-33506
+OIDC_CLIENT_SECRET=SUBSTITUA_PELO_SEGREDO_GERADO
+
+SEED_ADMIN_USERNAME=admin
+SEED_ADMIN_PASSWORD=SUBSTITUA_POR_UMA_SENHA_FORTE
+
+SEED_USER_USERNAME=usuario
+SEED_USER_PASSWORD=SUBSTITUA_POR_OUTRA_SENHA_FORTE
+```
+
+Os valores acima são marcadores e precisam ser substituídos.
+
+O `OIDC_CLIENT_SECRET` autentica a aplicação perante o provedor. Ele não é a senha utilizada no formulário de login.
+
+## 2. Escolher HTTP ou HTTPS
+
+Use uma configuração completa e consistente.
+
+| Variável | HTTP local | HTTPS local |
+|---|---|---|
+| `ALLOW_LOCAL_HTTP` | `true` | `false` |
+| `OIDC_ISSUER` | `http://localhost:8001` | `https://localhost:8443` |
+| `AUTH_SERVER_ISSUER` | `http://localhost:8001` | `https://localhost:8443` |
+| `OIDC_AUTHORIZATION_ENDPOINT` | `http://localhost:8001/authorize` | `https://localhost:8443/authorize` |
+| `OIDC_REDIRECT_URI` | `http://localhost:8000/callback` | `https://localhost:8444/callback` |
+
+O protocolo, o host, a porta e o caminho do callback devem corresponder exatamente ao cadastro do cliente OAuth.
+
+Use `localhost` de forma consistente nas URLs do navegador e nas configurações.
+
+### Variáveis antigas no PowerShell
+
+Variáveis definidas com `$env:` pertencem à sessão do terminal e podem prevalecer sobre o `.env`.
+
+Após salvar a configuração no `.env`, execute o bloco abaixo em cada terminal que será usado para iniciar os servidores:
 
 ```powershell
-./.venv/Scripts/python.exe scripts/seed.py --rotate-key
+$nomesConfiguracao = @(
+    "ALLOW_LOCAL_HTTP",
+    "OIDC_ISSUER",
+    "AUTH_SERVER_ISSUER",
+    "OIDC_AUTHORIZATION_ENDPOINT",
+    "OIDC_REDIRECT_URI",
+    "OIDC_CLIENT_ID",
+    "OIDC_CLIENT_SECRET",
+    "SEED_ADMIN_USERNAME",
+    "SEED_ADMIN_PASSWORD",
+    "SEED_USER_USERNAME",
+    "SEED_USER_PASSWORD"
+)
+
+foreach ($nomeConfiguracao in $nomesConfiguracao) {
+    Remove-Item -LiteralPath "Env:$nomeConfiguracao" -ErrorAction SilentlyContinue
+}
 ```
 
-### 4. Subir os dois servidores (em terminais separados)
+Isso remove as sobrescritas da sessão atual, permitindo carregar os valores do `.env`.
 
-**Terminal 1 — Servidor de Autorização (porta 8001):**
+Sempre reinicie os servidores após alterar a configuração.
+
+## 3. Executar o seed
+
+Com o `.env` salvo:
 
 ```powershell
-$env:ALLOW_LOCAL_HTTP = 'true'
-./.venv/Scripts/python.exe -m flask --app auth_server run --host 127.0.0.1 --port 8001
+.\.venv\Scripts\python.exe scripts/seed.py
 ```
 
-**Terminal 2 — Aplicação Cliente (porta 8000):**
+O script inicializa:
+
+- Chaves RSA em `instance/keys/`.
+- Banco do provedor em `instance/auth_server.sqlite3`.
+- Banco da aplicação em `instance/app.sqlite3`.
+- Cliente OAuth e callback autorizado.
+- Usuários de demonstração.
+
+Aguarde a mensagem:
+
+```text
+Seed concluido com sucesso!
+```
+
+Confira o issuer e o callback impressos antes de continuar.
+
+Para demonstrar a rotação de chave RSA:
 
 ```powershell
-$env:ALLOW_LOCAL_HTTP = 'true'
-./.venv/Scripts/python.exe -m flask --app app run --host 127.0.0.1 --port 8000
+.\.venv\Scripts\python.exe scripts/seed.py --rotate-key
 ```
 
-Acesse:
-- Aplicação Cliente: [http://localhost:8000](http://localhost:8000)
-- Servidor de Autorização: [http://localhost:8001](http://localhost:8001)
-- Discovery: [http://localhost:8001/.well-known/openid-configuration](http://localhost:8001/.well-known/openid-configuration)
-- JWKS: [http://localhost:8001/jwks.json](http://localhost:8001/jwks.json)
+### Banco existente após mudança do issuer
 
----
+O vínculo local usa o par `(oidc_issuer, oidc_sub)`.
 
-## Como executar com HTTPS (TLS)
+Mudar de `http://localhost:8001` para `https://localhost:8443` altera esse vínculo. Em bancos existentes, o seed pode apresentar:
 
-Ambas as aplicações exigem HTTPS por padrão (`ALLOW_LOCAL_HTTP=false`). Para rodar com TLS local:
+```text
+UNIQUE constraint failed: users.user_name
+```
 
-1. No `.env`, defina `ALLOW_LOCAL_HTTP=false` e atualize `OIDC_ISSUER`, `AUTH_SERVER_ISSUER`, `OIDC_AUTHORIZATION_ENDPOINT` e `OIDC_REDIRECT_URI` para `https://...`.
-2. Reexecute `./.venv/Scripts/python.exe scripts/seed.py` para cadastrar a `redirect_uri` HTTPS exata.
-3. Inicie ambos os servidores informando `--cert` e `--key` (ex.: certificados gerados com `mkcert` ou OpenSSL):
+Nesse caso:
+
+1. Pare os servidores.
+2. Faça backup dos bancos.
+3. Migre explicitamente os vínculos do mesmo provedor local para o novo issuer.
+4. Preserve os valores de `oidc_sub`.
+5. Execute novamente o seed.
+
+Não vincule automaticamente identidades pelo nome de usuário ou e-mail. Não apague o banco para contornar o erro sem avaliar os dados existentes.
+
+## 4. Executar com HTTP local
+
+No `.env`, configure:
+
+```env
+ALLOW_LOCAL_HTTP=true
+OIDC_ISSUER=http://localhost:8001
+AUTH_SERVER_ISSUER=http://localhost:8001
+OIDC_AUTHORIZATION_ENDPOINT=http://localhost:8001/authorize
+OIDC_REDIRECT_URI=http://localhost:8000/callback
+```
+
+Execute o seed e inicie os servidores em terminais separados.
+
+Terminal 1 — provedor:
 
 ```powershell
-./.venv/Scripts/python.exe -m flask --app auth_server run --host 127.0.0.1 --port 8443 --cert cert.pem --key key.pem
-./.venv/Scripts/python.exe -m flask --app app run --host 127.0.0.1 --port 8444 --cert cert.pem --key key.pem
+.\.venv\Scripts\python.exe -m flask --app auth_server run --host 127.0.0.1 --port 8001
 ```
 
-Em conexões HTTPS, todos os cookies de sessão e fluxo recebem automaticamente o atributo `Secure` (além de `HttpOnly` e `SameSite=Lax`).
+Terminal 2 — aplicação cliente:
 
----
+```powershell
+.\.venv\Scripts\python.exe -m flask --app app run --host 127.0.0.1 --port 8000
+```
+
+Endereços:
+
+- Aplicação: http://localhost:8000
+- Provedor: http://localhost:8001
+- Descoberta: http://localhost:8001/.well-known/openid-configuration
+- JWKS: http://localhost:8001/jwks.json
+
+A exceção HTTP é destinada apenas ao desenvolvimento local.
+
+## 5. Executar com HTTPS local
+
+### 5.1. Gerar o certificado
+
+Obtenha o executável adequado ao Windows nas versões oficiais:
+
+https://github.com/FiloSottile/mkcert/releases
+
+Os comandos abaixo consideram `mkcert.exe` na raiz do projeto.
+
+Instale a autoridade certificadora local:
+
+```powershell
+.\mkcert.exe -install
+```
+
+Gere o certificado e a chave:
+
+```powershell
+.\mkcert.exe -cert-file cert.pem -key-file key.pem localhost 127.0.0.1 ::1
+```
+
+Serão criados:
+
+- `cert.pem`: certificado TLS.
+- `key.pem`: chave privada TLS.
+
+Se o mkcert confirmar a instalação no Windows e apresentar erro apenas no `keytool` do Java, essa etapa adicional não é necessária para a aplicação Flask.
+
+### 5.2. Configurar o `.env`
+
+```env
+ALLOW_LOCAL_HTTP=false
+OIDC_ISSUER=https://localhost:8443
+AUTH_SERVER_ISSUER=https://localhost:8443
+OIDC_AUTHORIZATION_ENDPOINT=https://localhost:8443/authorize
+OIDC_REDIRECT_URI=https://localhost:8444/callback
+```
+
+Remova sobrescritas antigas do terminal conforme a seção 2 e execute o seed:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/seed.py
+```
+
+### 5.3. Iniciar o provedor
+
+Em um terminal na raiz do projeto:
+
+```powershell
+.\.venv\Scripts\python.exe -m flask --app auth_server run --host 127.0.0.1 --port 8443 --cert cert.pem --key key.pem
+```
+
+Mantenha esse terminal aberto.
+
+### 5.4. Configurar a confiança TLS do cliente
+
+Em outro terminal, na raiz do projeto:
+
+```powershell
+$caDir = & .\mkcert.exe -CAROOT
+$env:SSL_CERT_FILE = Join-Path $caDir "rootCA.pem"
+$env:REQUESTS_CA_BUNDLE = $env:SSL_CERT_FILE
+```
+
+`SSL_CERT_FILE` é utilizado por clientes que respeitam essa configuração do OpenSSL. `REQUESTS_CA_BUNDLE` atende ao Requests, caso essa biblioteca seja utilizada.
+
+Essas variáveis valem para o terminal atual. Clientes que configuram seu próprio contexto TLS podem exigir o caminho da autoridade explicitamente no código.
+
+Não desative a verificação do certificado.
+
+### 5.5. Testar a conexão pelo Python
+
+Com o provedor ativo:
+
+```powershell
+@'
+import json
+import os
+import ssl
+import urllib.request
+
+context = ssl.create_default_context(
+    cafile=os.environ["SSL_CERT_FILE"]
+)
+
+url = "https://localhost:8443/.well-known/openid-configuration"
+
+with urllib.request.urlopen(url, context=context, timeout=5) as response:
+    data = json.load(response)
+    print("HTTP:", response.status)
+    print("Issuer:", data["issuer"])
+'@ | .\.venv\Scripts\python.exe -
+```
+
+Resultado esperado:
+
+```text
+HTTP: 200
+Issuer: https://localhost:8443
+```
+
+Esse teste usa a biblioteca padrão e não exige instalar Requests.
+
+### 5.6. Iniciar a aplicação cliente
+
+No mesmo terminal em que configurou a confiança TLS:
+
+```powershell
+.\.venv\Scripts\python.exe -m flask --app app run --host 127.0.0.1 --port 8444 --cert cert.pem --key key.pem
+```
+
+Endereços:
+
+- Aplicação: https://localhost:8444
+- Provedor: https://localhost:8443
+- Descoberta: https://localhost:8443/.well-known/openid-configuration
+- JWKS: https://localhost:8443/jwks.json
+
+Antes do login, confirme que a aplicação mostra:
+
+```text
+Provedor (Issuer): https://localhost:8443
+```
+
+Em HTTPS, os cookies de sessão e fluxo recebem `Secure`, além de `HttpOnly` e `SameSite=Lax`, conforme a implementação do projeto.
+
+## 6. Realizar o login
+
+1. Abra a aplicação cliente.
+2. Clique em **Entrar com OpenID Connect**.
+3. No provedor, informe o usuário e a senha cadastrados pelo seed.
+4. Confirme o consentimento, quando solicitado.
+5. Aguarde o retorno à aplicação cliente.
+
+| Perfil | Usuário configurado em | Senha configurada em |
+|---|---|---|
+| Administrador | `SEED_ADMIN_USERNAME` | `SEED_ADMIN_PASSWORD` |
+| Usuário comum | `SEED_USER_USERNAME` | `SEED_USER_PASSWORD` |
+
+Os nomes padrão são `admin` e `usuario`. As senhas são definidas localmente.
+
+Alterar a senha no `.env` não altera imediatamente o banco: execute o seed com sucesso para atualizar o cadastro.
+
+Após o retorno, a aplicação troca o código por tokens, valida o ID Token, localiza o usuário por issuer e sub e cria a sessão local.
 
 ## Variáveis de ambiente
 
-| Variável | Componente | Uso |
-| --- | --- | --- |
-| `ALLOW_LOCAL_HTTP` | Ambos | Com `true`, libera HTTP apenas em `localhost`/`127.0.0.1` para desenvolvimento. |
-| `OIDC_ISSUER` | Cliente | Emissor esperado e base da descoberta (`/.well-known/openid-configuration`). |
-| `OIDC_AUTHORIZATION_ENDPOINT` | Cliente | Endpoint de autorização (opcional; descoberto automaticamente se omitido). |
-| `OIDC_CLIENT_ID` | Cliente | Identificador da aplicação cadastrado no provedor. |
-| `OIDC_CLIENT_SECRET` | Cliente | Segredo do cliente usado na autenticação em `/token`. |
-| `OIDC_REDIRECT_URI` | Cliente | URI absoluta exata do callback (`/callback`). |
-| `OIDC_HTTP_TIMEOUT` | Cliente | Timeout explícito (segundos) nas chamadas HTTP ao provedor (sem retry). |
-| `OIDC_CLOCK_SKEW_SECONDS` | Cliente | Tolerância máxima de relógio (padrão `60`s) para `exp` e `iat`. |
-| `AUTH_SERVER_ISSUER` | Provedor | Identificador `iss` publicado na descoberta e em todos os tokens emitidos. |
-| `AUTH_SERVER_CODE_TTL` | Provedor | Validade do `authorization_code` em segundos (máximo `60`). |
-| `AUTH_SERVER_TOKEN_TTL` | Provedor | Validade do `id_token` e `access_token` em segundos (padrão `900`). |
-| `AUTH_SERVER_REFRESH_TTL` | Provedor | Validade do `refresh_token` em segundos (padrão `86400`). |
-| `AUTH_SERVER_RATE_LIMIT_MAX` | Provedor | Máximo de tentativas de login falhas por janela antes do HTTP `429`. |
-| `AUTH_SERVER_RATE_LIMIT_WINDOW` | Provedor | Janela do rate limiting em segundos (padrão `300`). |
+| Variável | Uso |
+|---|---|
+| `ALLOW_LOCAL_HTTP` | Libera HTTP local quando `true` |
+| `OIDC_ISSUER` | Emissor esperado pela aplicação cliente |
+| `OIDC_AUTHORIZATION_ENDPOINT` | Endpoint de autorização; pode ser descoberto quando omitido, conforme a implementação |
+| `OIDC_CLIENT_ID` | Identificador do cliente OAuth |
+| `OIDC_CLIENT_SECRET` | Credencial da aplicação para o endpoint de tokens |
+| `OIDC_REDIRECT_URI` | Endereço exato do callback |
+| `OIDC_HTTP_TIMEOUT` | Timeout das chamadas ao provedor; padrão de 5 segundos |
+| `OIDC_CLOCK_SKEW_SECONDS` | Tolerância de relógio; padrão de 60 segundos |
+| `AUTH_SERVER_ISSUER` | Issuer publicado pelo provedor |
+| `AUTH_SERVER_CODE_TTL` | Validade do código; máximo de 60 segundos |
+| `AUTH_SERVER_TOKEN_TTL` | Validade dos tokens; padrão de 900 segundos |
+| `AUTH_SERVER_REFRESH_TTL` | Validade configurada do refresh token; padrão de 86400 segundos |
+| `AUTH_SERVER_RATE_LIMIT_MAX` | Limite de tentativas de login falhas por janela |
+| `AUTH_SERVER_RATE_LIMIT_WINDOW` | Janela do limite; padrão de 300 segundos |
+| `SEED_ADMIN_USERNAME` | Nome do administrador de demonstração |
+| `SEED_ADMIN_PASSWORD` | Senha do administrador de demonstração |
+| `SEED_USER_USERNAME` | Nome do usuário comum de demonstração |
+| `SEED_USER_PASSWORD` | Senha do usuário comum de demonstração |
+| `SSL_CERT_FILE` | Caminho local da autoridade certificadora para clientes TLS compatíveis |
+| `REQUESTS_CA_BUNDLE` | Caminho da autoridade certificadora para Requests, quando utilizado |
 
----
+A emissão de um refresh token não implica, por si só, suporte ao grant `refresh_token`. Consulte os grants anunciados na descoberta.
 
-## Decisões de segurança (Checklist 4.3 & RFCs)
+## Solução de problemas
 
-- **Vínculo de identidade (OIDC Core §5.7)**: os usuários locais na tabela `users` são vinculados exclusivamente por `(oidc_issuer, oidc_sub)` — nunca por e-mail ou nome. Identidades não cadastradas previamente são recusadas com HTTP `403`.
-- **Assinatura e algoritmo (RFC 8725 §2.1, §3.1)**: o cliente mantém lista fixa `ALLOWED_ID_TOKEN_ALGORITHMS = ("RS256",)`. Tokens com `alg="none"` ou `HS256` (mesmo assinados com os bytes da chave pública) são sempre rejeitados.
-- **PKCE S256 (RFC 7636) e `redirect_uri` exata (RFC 9700 §2.1)**: o provedor rejeita `code_challenge_method=plain`, exige comparação exata de string em `redirect_uri` (sem redirecionar em erro — RFC 6749 §4.1.2.1) e revoga todos os tokens emitidos caso um `authorization_code` seja reutilizado.
-- **Proteção de logs**: a query string de `/callback` é mascarada automaticamente nos logs de acesso do Werkzeug (`/callback?[REDACTED]`) para impedir vazamento de `code` e `state`.
-- **Autorização por `role`**: após a validação criptográfica do ID Token, o perfil (`admin` ou `user`) é aplicado e revalidado no servidor em cada acesso à rota `/admin` (`200` para `admin`, `403` para `user`, `401` sem sessão).
+| Problema | Verificação |
+|---|---|
+| `ERR_CONNECTION_REFUSED` | Confirme que o servidor está ativo na porta e no protocolo configurados |
+| Página mostra issuer HTTP durante uso de HTTPS | Revise o `.env`, as variáveis do terminal e reinicie a aplicação |
+| `Credenciais inválidas` | Use as credenciais da última execução bem-sucedida do seed |
+| HTTP `429` | Aguarde o fim da janela de limitação de tentativas |
+| `UNIQUE constraint failed: users.user_name` | Verifique se houve mudança de issuer e migre os vínculos existentes |
+| Falha de rede na descoberta OIDC | Teste o endpoint pelo Python e confira a confiança TLS |
+| Issuer da descoberta divergente | Alinhe `OIDC_ISSUER` e `AUTH_SERVER_ISSUER` |
+| Callback não autorizado | Confira o endereço exato e execute o seed |
+| Porta ocupada | Encerre a instância anterior antes de iniciar outro servidor |
 
----
-
-## Executar os testes automatizados (incluindo os 15 testes negativos)
+Para conferir o issuer recebido pelo Python:
 
 ```powershell
-./.venv/Scripts/python.exe -m pytest -v
+.\.venv\Scripts\python.exe -c "import os; print(os.getenv('OIDC_ISSUER'))"
 ```
 
-A suíte `tests/test_security_suite.py` cobre todos os **15 testes negativos obrigatórios** da seção 5 do enunciado, além de fluxos ponta a ponta (login `admin`, login `user`, rotação de chaves JWKS, recusa de consentimento, `client_secret_basic`, headers `Cache-Control: no-store`, máscara de logs e política HTTPS).
+Esse comando mostra apenas a variável do processo; não carrega o `.env`.
+
+Após uma falha no callback, comece uma nova tentativa pela página inicial. Não reutilize a URL anterior, pois o código é temporário e de uso único.
+
+## Decisões de segurança
+
+- Identidade local vinculada por `(oidc_issuer, oidc_sub)`.
+- ID Tokens aceitos apenas com o algoritmo permitido `RS256`.
+- Validação de assinatura e dos claims exigidos pelo fluxo OIDC.
+- Uso de `state`, `nonce` e PKCE S256.
+- Comparação exata do callback cadastrado.
+- Códigos temporários e de uso único.
+- Senhas protegidas com Argon2id.
+- Limitação de tentativas de autenticação.
+- Autorização por perfil verificada no servidor.
+- Mascaramento da query string de `/callback` nos logs de acesso.
+- Tokens processados no backend.
+
+Referências: RFC 6749, RFC 7636, RFC 8725, RFC 9700 e OpenID Connect Core 1.0.
+
+## Testes automatizados
+
+Execute:
+
+```powershell
+.\.venv\Scripts\python.exe -m pytest -v
+```
+
+A suíte está em `tests/test_security_suite.py`. Confira os resultados para verificar a cobertura dos testes negativos e dos fluxos previstos na avaliação.
+
+Valide também manualmente:
+
+- Login de administrador e usuário comum.
+- Rejeição de senha incorreta.
+- Acesso permitido ou negado conforme o perfil.
+- Logout.
+- Login completo por HTTPS.
+- Reexecução do seed sem duplicidades na mesma configuração.
 
 ## Coleção de requisições
 
-Importe [`docs/postman_collection.json`](docs/postman_collection.json) no Postman ou Insomnia para testar todos os endpoints do provedor e do cliente.
+Importe [docs/postman_collection.json](docs/postman_collection.json) no Postman ou em ferramenta compatível.
+
+## Antes de enviar ao GitHub
+
+Não versione:
+
+- `.env` e credenciais reais.
+- `.venv/`.
+- `instance/`, bancos e backups locais.
+- Chaves privadas RSA ou TLS.
+- Certificados locais e arquivos da autoridade do mkcert.
+- Executável local `mkcert.exe`.
+- Logs contendo dados sensíveis.
+
+Mantenha `.env.example` com marcadores, sem segredos reais.
+
+Revise:
+
+```powershell
+git status
+git diff
+git diff --cached
+git diff --check
+```
+
+Confira se arquivos locais já estão rastreados:
+
+```powershell
+git ls-files .env instance cert.pem key.pem rootCA.pem rootCA-key.pem mkcert.exe
+```
+
+O `.gitignore` não remove arquivos já rastreados. Se necessário, use `git rm --cached` somente nos caminhos identificados, preservando os arquivos locais.
+
+Execute os testes e revise os arquivos preparados antes do commit. Credenciais expostas devem ser substituídas, mesmo após sua remoção do código.

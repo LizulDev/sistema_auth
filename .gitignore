@@ -1,29 +1,25 @@
-# Environment and secrets
+# Configuração privada
 .env
 .env.*
 !.env.example
 
-# Python virtual environment and caches
+# Ambiente Python
 .venv/
-venv/
 __pycache__/
 *.py[cod]
-*$py.class
 .pytest_cache/
-.coverage
-htmlcov/
 
-# Local runtime state, databases, and private keys
+# Bancos, chaves e estado local
 instance/
-*.sqlite3
-*.sqlite3-shm
-*.sqlite3-wal
-*.pem
-*.key
-*.crt
 
-# IDE / OS
-.vscode/
-.idea/
-.DS_Store
-Thumbs.db
+# Certificados locais
+cert.pem
+key.pem
+rootCA.pem
+rootCA-key.pem
+
+# Ferramenta local
+mkcert.exe
+
+# Logs
+*.log

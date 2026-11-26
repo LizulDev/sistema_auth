@@ -23,7 +23,7 @@ Principais arquivos:
 - `scripts/seed.py`: cadastro do cliente OAuth e dos usuários de demonstração.
 - `tests/test_security_suite.py`: testes automatizados.
 - `docs/postman_collection.json`: coleção de requisições.
-- `docs/relatorio.pdf`: relatório técnico da avaliação (fonte em `docs/relatorio.html`).
+- `docs/relatorio.pdf`: relatório técnico da avaliação (fonte LaTeX em `docs/relatorio.tex`).
 - `docs/roteiro-demo.md`: roteiro para a demonstração ao vivo.
 - `.env.example`: modelo de configuração sem segredos reais.
 - `instance/`: bancos e chaves gerados localmente.

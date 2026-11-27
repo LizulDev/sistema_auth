@@ -197,9 +197,9 @@ O trabalho implementa a \textbf{Opção 1} em dois componentes independentes esc
   \begin{tikzpicture}[
     x=1cm, y=-1cm,
     >=Stealth,
-    actor/.style={rectangle, rounded corners=2.5pt, minimum width=3.35cm, minimum height=0.76cm, align=center, text=white, font=\bfseries\fontsize{7.2}{8.3}\selectfont},
-    note/.style={rectangle, rounded corners=2pt, draw, align=center, font=\fontsize{6.2}{7.3}\selectfont, inner sep=2.2pt},
-    msg/.style={font=\fontsize{6.25}{7.1}\selectfont, fill=white, inner sep=1pt},
+    actor/.style={rectangle, rounded corners=2.5pt, minimum width=3.35cm, minimum height=0.72cm, align=center, text=white, font=\bfseries\fontsize{7.2}{8.3}\selectfont},
+    note/.style={rectangle, rounded corners=2pt, draw, align=center, font=\fontsize{6.0}{7.0}\selectfont, inner sep=2.0pt},
+    msg/.style={font=\fontsize{6.15}{7.0}\selectfont, fill=white, inner sep=0.9pt},
     arrB/.style={->, thick, color=unoescblue},
     arrBD/.style={->, thick, dashed, color=unoescblue},
     arrG/.style={->, thick, color=tealaccent},
@@ -211,65 +211,65 @@ O trabalho implementa a \textbf{Opção 1} em dois componentes independentes esc
     \def\xOP{11.25}
     \def\xRS{15.65}
 
-    \node[actor, fill=unoescblue] (U) at (\xU, 0.42) {Usuário / Navegador\\[-1pt]{\normalfont\fontsize{6}{6.8}\selectfont\color{white!85}Resource Owner (sem JWT)}};
-    \node[actor, fill=unoescblue!85, minimum width=3.65cm] (RP) at (\xRP, 0.42) {Aplicação Cliente (RP)\\[-1pt]{\normalfont\fontsize{6}{6.8}\selectfont\color{white!85}app/ (:8444 HTTPS | :8000 HTTP)}};
-    \node[actor, fill=tealaccent, minimum width=3.75cm] (OP) at (\xOP, 0.42) {Servidor de Autorização\\[-1pt]{\normalfont\fontsize{6}{6.8}\selectfont\color{white!85}auth\_server/ (:8443 | :8001)}};
-    \node[actor, fill=purpleaccent, minimum width=3.0cm] (RS) at (\xRS, 0.42) {Recursos / JWKS\\[-1pt]{\normalfont\fontsize{6}{6.8}\selectfont\color{white!85}/jwks.json e /userinfo}};
+    \node[actor, fill=unoescblue] (U) at (\xU, 0.38) {Usuário / Navegador\\[-1pt]{\normalfont\fontsize{6}{6.8}\selectfont\color{white!85}Resource Owner (sem JWT)}};
+    \node[actor, fill=unoescblue!85, minimum width=3.65cm] (RP) at (\xRP, 0.38) {Aplicação Cliente (RP)\\[-1pt]{\normalfont\fontsize{6}{6.8}\selectfont\color{white!85}app/ (:8444 HTTPS | :8000 HTTP)}};
+    \node[actor, fill=tealaccent, minimum width=3.75cm] (OP) at (\xOP, 0.38) {Servidor de Autorização\\[-1pt]{\normalfont\fontsize{6}{6.8}\selectfont\color{white!85}auth\_server/ (:8443 | :8001)}};
+    \node[actor, fill=purpleaccent, minimum width=3.0cm] (RS) at (\xRS, 0.38) {Recursos / JWKS\\[-1pt]{\normalfont\fontsize{6}{6.8}\selectfont\color{white!85}/jwks.json e /userinfo}};
 
-    \draw[dashed, color=slate500!70, line width=0.55pt] (\xU, 0.82) -- (\xU, 9.75);
-    \draw[dashed, color=slate500!70, line width=0.55pt] (\xRP, 0.82) -- (\xRP, 9.75);
-    \draw[dashed, color=slate500!70, line width=0.55pt] (\xOP, 0.82) -- (\xOP, 9.75);
-    \draw[dashed, color=slate500!70, line width=0.55pt] (\xRS, 0.82) -- (\xRS, 9.75);
+    \draw[dashed, color=slate500!70, line width=0.55pt] (\xU, 0.76) -- (\xU, 10.45);
+    \draw[dashed, color=slate500!70, line width=0.55pt] (\xRP, 0.76) -- (\xRP, 10.45);
+    \draw[dashed, color=slate500!70, line width=0.55pt] (\xOP, 0.76) -- (\xOP, 10.45);
+    \draw[dashed, color=slate500!70, line width=0.55pt] (\xRS, 0.76) -- (\xRS, 10.45);
 
-    \draw[arrB] (\xU, 1.24) -- node[msg, above=0.8pt] {\textbf{1.} GET /login (``Entrar com OpenID Connect'')} (\xRP, 1.24);
+    \draw[arrB] (\xU, 1.18) -- node[msg, above=1pt] {\textbf{1.} GET /login (``Entrar com OpenID Connect'')} (\xRP, 1.18);
 
-    \node[note, fill=unoescblue!6, draw=unoescblue!50, text=unoescblue, minimum width=5.1cm] at (\xRP, 1.76) {
+    \node[note, fill=unoescblue!6, draw=unoescblue!50, text=unoescblue, minimum width=5.1cm] at (\xRP, 1.63) {
       \textbf{2.} Gera \texttt{state}, \texttt{nonce}, \texttt{code\_verifier} (256 bits) + cookie \texttt{oidc\_flow}\\
       \texttt{code\_challenge = BASE64URL(SHA256(code\_verifier))}
     };
 
-    \draw[arrBD] (\xRP, 2.34) -- node[msg, above=0.8pt] {3. 302 $\to$ /authorize (\texttt{response\_type=code}, S256)} (\xU, 2.34);
+    \draw[arrBD] (\xRP, 2.40) -- node[msg, above=1pt] {3. 302 $\to$ /authorize (\texttt{response\_type=code}, S256)} (\xU, 2.40);
 
-    \draw[arrG] (\xU, 2.80) -- node[msg, above=0.8pt, text=tealaccent] {\textbf{4.} GET /authorize (\texttt{client\_id}, \texttt{redirect\_uri} exata, \texttt{scope openid profile email}, \texttt{state}, \texttt{nonce}, \texttt{challenge})} (\xOP, 2.80);
+    \draw[arrG] (\xU, 2.84) -- node[msg, above=1pt, text=tealaccent] {\textbf{4.} GET /authorize (\texttt{client\_id}, \texttt{redirect\_uri} exata, \texttt{scope openid profile email}, \texttt{state}, \texttt{nonce}, \texttt{challenge})} (\xOP, 2.84);
 
-    \node[note, fill=tealaccent!7, draw=tealaccent!55, text=tealaccent!85!black, minimum width=5.4cm] at (\xOP, 3.42) {
+    \node[note, fill=tealaccent!7, draw=tealaccent!55, text=tealaccent!85!black, minimum width=5.4cm] at (\xOP, 3.43) {
       \textbf{5.} Valida \texttt{client\_id} e \texttt{redirect\_uri} (HTTP 400 sem redirecionar)\\
       Login Argon2id + Rate Limit (5/300s) $\to$ Consentimento explícito\\
       (senha trafega exclusivamente entre Navegador e OP)
     };
 
-    \draw[arrGD] (\xOP, 4.10) -- node[msg, above=0.8pt, text=tealaccent] {6. 302 $\to$ \texttt{redirect\_uri?code=<uso único, TTL<=60s>\&state=<idêntico>}} (\xU, 4.10);
+    \draw[arrGD] (\xOP, 4.34) -- node[msg, above=1pt, text=tealaccent] {6. 302 $\to$ \texttt{redirect\_uri?code=<uso único, TTL<=60s>\&state=<idêntico>}} (\xU, 4.34);
 
-    \draw[arrB] (\xU, 4.55) -- node[msg, above=0.8pt] {\textbf{7.} GET /callback?code=...\&state=... (+ \texttt{oidc\_flow})} (\xRP, 4.55);
+    \draw[arrB] (\xU, 4.78) -- node[msg, above=1pt] {\textbf{7.} GET /callback?code=...\&state=... (+ \texttt{oidc\_flow})} (\xRP, 4.78);
 
-    \node[note, fill=warnbg, draw=warnborder, text=warnborder!75!black, minimum width=4.95cm] at (\xRP, 5.06) {
+    \node[note, fill=warnbg, draw=warnborder, text=warnborder!75!black, minimum width=4.95cm] at (\xRP, 5.23) {
       \textbf{8.} Consome fluxo e valida \texttt{state} (\texttt{hmac.compare\_digest})\\
       Se divergir ou ausente $\to$ HTTP 400 e aborta antes de \texttt{/token}
     };
 
-    \draw[arrG] (\xRP, 5.66) -- node[msg, above=0.8pt] {\textbf{9.} Discovery + POST /token (back-channel, \texttt{retries=0})} (\xOP, 5.66);
-    \draw[arrGD] (\xOP, 6.12) -- node[msg, above=0.8pt, text=tealaccent] {Valida \texttt{client\_secret}, \texttt{code}, PKCE $\to$ 200 (\texttt{id\_token} RS256, \texttt{no-store})} (\xRP, 6.12);
+    \draw[arrG] (\xRP, 6.00) -- node[msg, above=1pt] {\textbf{9.} Discovery + POST /token (back-channel, \texttt{retries=0})} (\xOP, 6.00);
+    \draw[arrGD] (\xOP, 6.44) -- node[msg, above=1pt, text=tealaccent] {Valida \texttt{client\_secret}, \texttt{code}, PKCE $\to$ 200 (\texttt{id\_token} RS256, \texttt{no-store})} (\xRP, 6.44);
 
-    \draw[arrP] (\xRP, 6.58) -- node[msg, above=0.8pt, text=purpleaccent] {\textbf{10.} GET /jwks.json $\to$ obtém chave pública RSA correspondente ao \texttt{kid}} (\xRS, 6.58);
+    \draw[arrP] (\xRP, 6.88) -- node[msg, above=1pt, text=purpleaccent] {\textbf{10.} GET /jwks.json $\to$ obtém chave pública RSA correspondente ao \texttt{kid}} (\xRS, 6.88);
 
-    \node[note, fill=unoescblue!6, draw=unoescblue!55, text=unoescblue, minimum width=5.2cm] at (\xRP, 7.18) {
+    \node[note, fill=unoescblue!6, draw=unoescblue!55, text=unoescblue, minimum width=5.2cm] at (\xRP, 7.47) {
       \textbf{11.} Decompõe ID Token no log + Checklist 4.3 (itens 1--8)\\
       Lista fixa \texttt{RS256}, assinatura, \texttt{iss}, \texttt{aud}, \texttt{azp}, \texttt{exp}, \texttt{iat}, \texttt{nonce}\\
       Qualquer falha $\to$ \texttt{OidcAuthenticationError} (HTTP 400)
     };
 
-    \draw[arrP] (\xRP, 7.84) -- node[msg, above=0.8pt, text=purpleaccent] {\textbf{12.} GET /userinfo (\texttt{Bearer <access\_token>}) $\to$ valida \texttt{sub} idêntico (\#10)} (\xRS, 7.84);
+    \draw[arrP] (\xRP, 8.38) -- node[msg, above=1pt, text=purpleaccent] {\textbf{12.} GET /userinfo (\texttt{Bearer <access\_token>}) $\to$ valida \texttt{sub} idêntico (\#10)} (\xRS, 8.38);
 
-    \node[note, fill=okbg, draw=okfg!65, text=okfg, minimum width=5.2cm] at (\xRP, 8.43) {
+    \node[note, fill=okbg, draw=okfg!65, text=okfg, minimum width=5.2cm] at (\xRP, 8.97) {
       \textbf{13.} Vínculo local \texttt{(oidc\_issuer, oidc\_sub)} $\to$ \texttt{id} (\#9)\\
       Ausente $\to$ HTTP 403 (fail-closed). Presente $\to$ rotaciona\\
       \texttt{session\_id} (256 bits) em \texttt{sessions} e sincroniza \texttt{role} validado
     };
 
-    \draw[arrBD] (\xRP, 9.06) -- node[msg, above=0.8pt] {14. 302 $\to$ / (\texttt{Set-Cookie: session\_id; HttpOnly})} (\xU, 9.06);
-    \draw[arrB] (\xU, 9.50) -- node[msg, above=0.8pt] {\textbf{15.} GET /admin $\to$ RBAC no servidor (\texttt{admin}=200 | \texttt{user}=403)} (\xRP, 9.50);
+    \draw[arrBD] (\xRP, 9.88) -- node[msg, above=1pt] {14. 302 $\to$ / (\texttt{Set-Cookie: session\_id; HttpOnly})} (\xU, 9.88);
+    \draw[arrB] (\xU, 10.32) -- node[msg, above=1pt] {\textbf{15.} GET /admin $\to$ RBAC no servidor (\texttt{admin}=200 | \texttt{user}=403)} (\xRP, 10.32);
 
-    \draw[rounded corners=3pt, color=codeborder, line width=0.55pt] (-0.05, -0.06) rectangle (17.32, 9.82);
+    \draw[rounded corners=3pt, color=codeborder, line width=0.55pt] (-0.05, -0.06) rectangle (17.32, 10.52);
   \end{tikzpicture}
   \fonte{Elaboração dos autores.}
 \end{center}
